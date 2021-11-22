@@ -1,0 +1,23 @@
+# Object files
+*.obj
+
+# Logfiles
+*.tlog
+
+# Build Logs
+buildLog_Debug.txt
+buildLog_Release.txt
+buildLog_Summary.txt
+
+# Private batch files
+PrivateBatchFiles
+
+# Output directory
+x64
+
+# VS internal build directory
+/**/.vs
+/**/bin
+/**/obj
+/**/ScriptData
+/**/Deployment
