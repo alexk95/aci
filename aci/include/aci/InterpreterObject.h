@@ -2,6 +2,7 @@
 
 #include <aci/aciSharedDataTypes.h>
 #include <aci/InterpreterObject.h>
+#include <aci/Color.h>
 
 #include <list>
 #include <string>
@@ -56,8 +57,8 @@ namespace aci {
 		void setColor(int _r, int _g, int _b, int _a = 255);
 		void queueColor(int _r, int _g, int _b, int _a = 255);
 
-		void setColor(const aci::Color& _color);
-		void queueColor(const aci::Color& _color);
+		void setColor(const Color& _color);
+		void queueColor(const Color& _color);
 
 		// ################################################################################################################################
 

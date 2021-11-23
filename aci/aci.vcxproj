@@ -19,7 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\aDir.cpp" />
     <ClCompile Include="src\aFile.cpp" />
+    <ClCompile Include="src\API.cpp" />
     <ClCompile Include="src\Color.cpp" />
     <ClCompile Include="src\Convert.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
@@ -35,6 +37,7 @@
     <ClInclude Include="include\aci\aciSharedDataTypes.h" />
     <ClInclude Include="include\aci\aDir.h" />
     <ClInclude Include="include\aci\aFile.h" />
+    <ClInclude Include="include\aci\API.h" />
     <ClInclude Include="include\aci\Color.h" />
     <ClInclude Include="include\aci\Convert.h" />
     <ClInclude Include="include\aci\InterpreterCore.h" />

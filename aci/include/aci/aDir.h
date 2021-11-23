@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef ACI_EXPORTS
+#pragma warning(disable:4251)
+#endif // ACI_EXPORTS
+
 #include <aci/aciSharedDataTypes.h>
 
 #include <string>

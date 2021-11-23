@@ -1,13 +1,7 @@
 // aci header
 #include <aci/Settings.h>
-
-// uiCore header
-#include <akAPI/uiAPI.h>
-
-// Qt header
-#include <qdir.h>
-
-using namespace ak;
+#include <aci/aDir.h>
+#include <aci/OS.h>
 
 aci::Settings * g_instance{ nullptr };
 
@@ -27,19 +21,21 @@ void aci::Settings::clearInstance(void) {
 
 // Base class functions
 
-bool aci::Settings::handle(const QString& _command, const QStringList& _params) {
-	if (_params.count() == 2) {
-		if (_params.back() == "cfg") {
+bool aci::Settings::handle(const std::wstring& _command, const std::list<std::wstring>& _params) {
+	if (_params.size() == 2) {
+		if (_params.back() == L"cfg") {
 			cmdConfiguration();
 			return true;
 		}
 	}
-	else if (_params.count() == 3) {
-		if (_params[1] == "data") {
-			QDir d(_params.back());
+	else if (_params.size() == 3) {
+		auto it = _params.begin();
+		it++;
+		if (*it == L"data") {
+			aDir d(L"", _params.back());
 			if (!d.exists()) {
 				setColor(255, 0, 0);
-				print("The specified directory does not exist\n");
+				print(L"The specified directory does not exist\n");
 				return false;
 			}
 			else {
@@ -50,7 +46,7 @@ bool aci::Settings::handle(const QString& _command, const QStringList& _params) 
 	}
 
 	setColor(255, 0, 0);
-	print("Invalid arguments for \"" + key() + "\"\n");
+	print(L"Invalid arguments for \"" + key() + L"\"\n");
 	return false;
 }
 
@@ -60,14 +56,14 @@ bool aci::Settings::handle(const QString& _command, const QStringList& _params) 
 
 void aci::Settings::cmdConfiguration(void) {
 	showDelimiterLine();
-	print("###  ");
+	print(L"###  ");
 	print(key());
-	print(" configuration  ###\n\n");
+	print(L" configuration  ###\n\n");
 
 	setColor(255, 150, 50);
-	print("\tdata path                       ");
+	print(L"\tdata path                       ");
 	setColor(255, 255, 255);
-	print(m_dataPath + "\n");
+	print(m_dataPath + L"\n");
 }
 
 // ######################################################################################################
@@ -91,9 +87,11 @@ void aci::Settings::showCommandInfo(void) {
 // Private functions
 
 aci::Settings::Settings() {
-	m_dataPath = uiAPI::settings::getString("DataPath", QDir::currentPath());
+	AbstractOSHandler * os = OS::instance()->handler();
+	m_dataPath = os->getSettingsValue("DataPath", os->currentDirectory());
 }
 
 aci::Settings::~Settings() {
-	uiAPI::settings::setString("DataPath", m_dataPath);
+	AbstractOSHandler * os = OS::instance()->handler();
+	os->setSettingsValue("DataPath", m_dataPath);
 }

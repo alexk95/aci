@@ -45,31 +45,59 @@ bool aci::InterpreterObject::writeDataFile(const std::list<std::wstring>& _data,
 
 // Setter
 
-void aci::InterpreterObject::print(const std::string& _message) {
-	if (m_printer) { m_printer->print(_message); }
-}
-
-void aci::InterpreterObject::print(const std::wstring& _message) {
-	if (m_printer) { m_printer->print(_message); }
-}
-
 void aci::InterpreterObject::print(const char * _message) { print(std::string(_message)); }
 void aci::InterpreterObject::print(const wchar_t * _message) { print(std::wstring(_message)); }
 void aci::InterpreterObject::queuePrint(const char * _message) { queuePrint(std::string(_message)); }
 void aci::InterpreterObject::queuePrint(const wchar_t * _message) { queuePrint(std::wstring(_message)); }
 
+
+void aci::InterpreterObject::print(bool _value) {
+	if (_value) { print(L"TRUE"); }
+	else { print(L"FALSE"); }
+}
 void aci::InterpreterObject::queuePrint(bool _value) {
 	if (_value) { queuePrint(L"TRUE"); }
 	else { queuePrint(L"FALSE"); }
 }
 
+void aci::InterpreterObject::print(const std::string& _message) {
+	if (m_printer) { m_printer->print(_message); }
+}
+void aci::InterpreterObject::print(const std::wstring& _message) {
+	if (m_printer) { m_printer->print(_message); }
+}
+void aci::InterpreterObject::queuePrint(const std::string& _message) {
+	if (m_printer) { m_printer->printAsync(_message); }
+}
+void aci::InterpreterObject::queuePrint(const std::wstring& _message) {
+	if (m_printer) { m_printer->printAsync(_message); }
+}
+
+void aci::InterpreterObject::setColor(int _r, int _g, int _b, int _a) {
+	setColor(Color(_r, _g, _b, _a));
+}
 void aci::InterpreterObject::queueColor(int _r, int _g, int _b, int _a) { queueColor(Color(_r, _g, _b, _a)); }
+
+void aci::InterpreterObject::setColor(const Color& _color) {
+	if (m_printer) { m_printer->setColor(_color); }
+}
+void aci::InterpreterObject::queueColor(const Color& _color) {
+	if (m_printer) { m_printer->setColorAsync(_color); }
+}
 
 // ################################################################################################################################
 
 // Getter
 
+std::list<std::wstring> aci::InterpreterObject::filesInDirectory(const std::wstring& _subdirectory) {
+	AbstractOSHandler * os = OS::instance()->handler();
+	return os->filesInDirectory(_subdirectory, true);
+}
 
+std::list<std::wstring> aci::InterpreterObject::subdirectories(const std::wstring& _subdirectory) {
+	AbstractOSHandler * os = OS::instance()->handler();
+	return os->subdirectories(_subdirectory, true);
+}
 
 // ################################################################################################################################
 
@@ -88,13 +116,5 @@ std::wstring aci::InterpreterObject::isolateFilename(const std::wstring& _path) 
 		file.append(f);
 	}
 	return file;
-}
-
-void aci::InterpreterObject::setColor(const QColor& _color) {
-	if (m_printer) { m_printer->setColor(_color); }
-}
-
-void aci::InterpreterObject::setColor(int _r, int _g, int _b, int _a) {
-	setColor(QColor(_r, _g, _b, _a));
 }
 

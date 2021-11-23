@@ -19,5 +19,8 @@ namespace aci {
 		virtual std::list<std::wstring> filesInDirectory(const std::wstring& _path, bool _searchTopLevelDirectoryOnly) = 0;
 		virtual std::list<std::wstring> subdirectories(const std::wstring& _path, bool _searchTopLevelDirectoryOnly) = 0;
 		virtual std::wstring currentDirectory(void) = 0;
+
+		virtual std::wstring getSettingsValue(const std::string& _key, const std::wstring& _defaultValue = std::wstring()) = 0;
+		virtual void setSettingsValue(const std::string& _key, const std::wstring& _value) = 0;
 	};
 }
