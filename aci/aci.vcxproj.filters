@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\aci">
+      <UniqueIdentifier>{139a71e8-5512-4259-8165-c60708ce14f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\aci">
+      <UniqueIdentifier>{bb37d3f5-b50b-4589-bec3-f2cdb8c6c39d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Color.cpp">
+      <Filter>Source Files\aci</Filter>
+    </ClCompile>
+    <ClCompile Include="src\aFile.cpp">
+      <Filter>Source Files\aci</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InterpreterCore.cpp">
+      <Filter>Source Files\aci</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InterpreterObject.cpp">
+      <Filter>Source Files\aci</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Settings.cpp">
+      <Filter>Source Files\aci</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OS.cpp">
+      <Filter>Source Files\aci</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Convert.cpp">
+      <Filter>Source Files\aci</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\aci\aciSharedDataTypes.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\Color.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\AbstractInterpreterNotifier.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\AbstractPrinter.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\aDir.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\aFile.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\InterpreterCore.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\InterpreterObject.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\Settings.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\AbstractOSHandler.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\OS.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\Convert.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
