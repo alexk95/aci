@@ -22,6 +22,7 @@ bool aci::API::initialize(AbstractPrinter * _printer, AbstractInterpreterNotifie
 	OS::instance()->attachOSHandler(_osHandler);
 	InterpreterCore::instance()->attachNotifier(_notifier);
 	InterpreterCore::instance()->attachPrinter(_printer);
+	initialized = true;
 	return true;
 }
 

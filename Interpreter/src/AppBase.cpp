@@ -329,8 +329,8 @@ void AppBase::slotHandle(void) {
 
 void AppBase::slotPrintMessage(const QString& _message) {
 	QTextCursor cursor(m_out->textCursor());
-	m_out->append(_message);
-	//cursor.insertText(_str);
+	//m_out->append(_message);
+	cursor.insertText(_message);
 }
 
 void AppBase::slotSetColor(const QColor& _color) {

@@ -7,7 +7,8 @@ std::list<std::wstring> aci::splitString(const std::wstring& _str, const std::ws
 	auto it = temp.find(_splitBy);
 	while (it != std::wstring::npos) {
 		ret.push_back(temp.substr(0, it));
-		temp = temp.substr(it + _str.length());
+		temp = temp.substr(it + _splitBy.length());
+		it = temp.find(_splitBy);
 	}
 	ret.push_back(temp);
 	return ret;

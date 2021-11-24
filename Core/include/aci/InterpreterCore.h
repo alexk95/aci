@@ -14,6 +14,7 @@ namespace aci {
 	class AbstractInterpreterNotifier;
 	class AbstractPrinter;
 	class InterpreterObject;
+	class ScriptLoader;
 
 	class ACI_API_EXPORT InterpreterCore {
 	public:
@@ -61,9 +62,12 @@ namespace aci {
 
 		aci::InterpreterObject * findFirstMatchingItem(const std::wstring& _key);
 
+		ScriptLoader * scriptLoader(void) { return m_scriptLoader; }
+
 	private:
 		aci::AbstractPrinter *								m_printer;
 		AbstractInterpreterNotifier *						m_notifier;
+		ScriptLoader *										m_scriptLoader;
 		bool												m_autoClean;
 
 		std::list<std::wstring>								m_path;

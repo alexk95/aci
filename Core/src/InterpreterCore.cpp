@@ -6,6 +6,7 @@
 #include <aci/aDir.h>
 #include <aci/Convert.h>
 #include <aci/OS.h>
+#include <aci/ScriptLoader.h>
 
 using namespace aci;
 
@@ -300,10 +301,14 @@ void InterpreterCore::extractClassicSyntax(std::list<std::wstring>& _dest, const
 
 InterpreterCore::InterpreterCore()
 	: m_printer(nullptr), m_autoClean(true), m_notifier(nullptr)
-{ setCurrentPath(OS::instance()->handler()->currentDirectory()); }
+{
+	setCurrentPath(OS::instance()->handler()->currentDirectory());
+	m_scriptLoader = new ScriptLoader(this);
+}
 
 InterpreterCore::~InterpreterCore() {
 	if (m_autoClean) {
 		for (auto obj : m_objects) { delete obj.second; }
 	}
+	delete m_scriptLoader;
 }
