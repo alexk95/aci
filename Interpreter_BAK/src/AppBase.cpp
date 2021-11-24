@@ -1,12 +1,15 @@
 // Application header
 #include "AppBase.h"			// Corresponding header
-#include "Settings.h"
+#include "InterpreterCore.h"
+#include <aci/Settings.h>
+#include <aDir.h>
+#include <aFile.h>
 #include "Windows.h"
 
-#include <aci/API.h>
-#include <aci/InterpreterCore.h>
-#include <aci/aDir.h>
-#include <aci/aFile.h>
+// Scripts
+#include "sCode.h"
+#include "sMerge.h"
+#include "sRM.h"
 
 // AK header
 #include <akAPI/uiAPI.h>		// The uiAPI
@@ -20,9 +23,6 @@
 
 #include <qwidget.h>
 #include <qlayout.h>
-#include <qtextstream.h>
-#include <qdir.h>
-#include <qfile.h>
 
 // Qt header
 #include <qevent.h>
@@ -109,17 +109,20 @@ AppBase::AppBase(int _argc, char ** _argv)
 
 	m_inLabel->setStyleSheet("#a_inputLabel{color: #40ff40;}");
 
+	// Load application settings
+	aci::Settings::instance();
+
 	// Start interpreter
-	aci::API::initialize(this, this, this);
-	aci::API::setCurrentPath(Settings::instance()->dataPath());
 	loadScripts();
+	InterpreterCore::instance()->attachPrinter(this);
+	InterpreterCore::instance()->attachNotifier(this);
 
-	m_inLabel->setText("<: aci@" + QString::fromStdWString(aci::API::currentPath()) + " <: ");
+	m_inLabel->setText("<: aci@" + InterpreterCore::instance()->currentPath() + " <: ");
 
-	setColor(aci::Color(150, 150, 255));
-	print("<: aci@" + QString::fromStdWString(aci::API::currentPath()) + " <: ");
+	setColor(QColor(150, 150, 255));
+	print("<: aci@" + InterpreterCore::instance()->currentPath() + " <: ");
 	setColor(QColor(255, 255, 255));
-	print(QString("Use \"?\" for help\n"));
+	print("Use \"?\" for help\n");
 
 	connect(m_in, &aLineEditWidget::returnPressed, this, &AppBase::slotHandle);
 	connect(m_in, &aLineEditWidget::textChanged, this, &AppBase::slotInputChanged);
@@ -130,125 +133,50 @@ AppBase::AppBase(int _argc, char ** _argv)
 }
 
 AppBase::~AppBase() {
-	aci::API::cleanUp();
+	InterpreterCore::clearInstance();
 }
-
-// #########################################################################################
-
-// Base class functions
 
 bool AppBase::closeEvent(void) {
 	uiAPI::settings::setBool("Fullscreen", m_mainWindow->window()->isMaximized());
 	return true;
 }
 
+void AppBase::setColor(const QColor& _color) {
+	m_out->moveCursor(QTextCursor::End);
+	QTextCursor cursor(m_out->textCursor());
+
+	QTextCharFormat format = cursor.charFormat();
+	format.setForeground(QBrush(_color));
+	cursor.setCharFormat(format);
+
+	m_out->setTextCursor(cursor);
+}
+
+void AppBase::print(const QString& _str) {
+	QTextCursor cursor(m_out->textCursor());
+	cursor.insertText(_str);
+}
+
 void AppBase::shutdown(void) {
 	m_mainWindow->close();
 }
 
-void AppBase::print(const std::string& _str) { slotPrintMessage(QString(_str.c_str())); }
-void AppBase::print(const std::wstring& _str) { slotPrintMessage(QString::fromWCharArray(_str.c_str())); }
-void AppBase::print(const QString& _str) { slotPrintMessage(_str); }
-void AppBase::printAsync(const std::string& _str) { QMetaObject::invokeMethod(this, "slotPrintMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString(_str.c_str()))); }
-void AppBase::printAsync(const std::wstring& _str) { QMetaObject::invokeMethod(this, "slotPrintMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString::fromWCharArray(_str.c_str()))); }
-void AppBase::printAsync(const QString& _str) { QMetaObject::invokeMethod(this, "slotPrintMessage", Qt::QueuedConnection, Q_ARG(const QString&, _str)); }
-void AppBase::setColor(const aci::Color& _color) { slotSetColor(QColor(_color.r(), _color.g(), _color.b(), _color.a())); }
-void AppBase::setColorAsync(const aci::Color& _color) { QMetaObject::invokeMethod(this, "slotSetColor", Qt::QueuedConnection, Q_ARG(const QColor&, QColor(_color.r(), _color.g(), _color.b(), _color.a()))); }
-void AppBase::setColor(const QColor& _color) { slotSetColor(_color); }
-void AppBase::setColorAsync(const QColor& _color) { QMetaObject::invokeMethod(this, "slotSetColor", Qt::QueuedConnection, Q_ARG(const QColor&, _color)); }
-
-bool AppBase::fileExists(const std::wstring& _path) {
-	return QFile(QString::fromStdWString(_path)).exists();
-}
-
-bool AppBase::deleteFile(const std::wstring& _path) {
-	QFile file(QString::fromStdWString(_path));
-	if (file.exists()) {
-		return file.remove();
-	}
-	return true;
-}
-
-bool AppBase::readLinesFromFile(std::list<std::wstring>& _data, const std::wstring& _path) {
-	QFile file(QString::fromStdWString(_path));
-	if (!file.exists()) { assert(0); return false; }
-	if (!file.open(QIODevice::ReadOnly)) { assert(0); return false; }
-	while (!file.atEnd()) {
-		_data.push_back(QString(file.readLine()).toStdWString());
-	}
-
-	file.close();
-	return true;
-}
-
-bool AppBase::writeLinesToFile(const std::list<std::wstring>& _data, const std::wstring& _path) {
-	QFile file(QString::fromStdWString(_path));
-	if (!file.open(QIODevice::WriteOnly)) { assert(0); return false; }
-	QTextStream stream(&file);
-	for (auto l : _data) {
-		stream << QString::fromStdWString(l) << "\n";
-	}
-	file.close();
-	return true;
-}
-
-bool AppBase::directoryExists(const std::wstring& _path) {
-	return QDir(QString::fromStdWString(_path)).exists();
-}
-
-std::list<std::wstring> AppBase::filesInDirectory(const std::wstring& _path, bool _searchTopLevelDirectoryOnly) {
-	QDir dir(QString::fromStdWString(_path));
-	std::list<std::wstring> ret;
-	if (dir.exists()) {
-		for (auto entry : dir.entryList(QDir::Filter::Files)) {
-			ret.push_back(entry.toStdWString());
-		}
-	}
-	return ret;
-}
-
-std::list<std::wstring> AppBase::subdirectories(const std::wstring& _path, bool _searchTopLevelDirectoryOnly) {
-	QDir dir(QString::fromStdWString(_path));
-	std::list<std::wstring> ret;
-	if (dir.exists()) {
-		for (auto entry : dir.entryList(QDir::Filter::Dirs)) {
-			ret.push_back(entry.toStdWString());
-		}
-	}
-	return ret;
-}
-
-std::wstring AppBase::currentDirectory(void) {
-	return QDir::currentPath().toStdWString();
-}
-
-std::wstring AppBase::scriptDirectory(void) {
-	return Settings::instance()->dataPath() + L"/ScriptData";
-}
-
-std::wstring AppBase::getSettingsValue(const std::string& _key, const std::wstring& _defaultValue) {
-	return uiAPI::settings::getString(QString::fromStdString(_key), QString::fromStdWString(_defaultValue)).toStdWString();
-}
-
-void AppBase::setSettingsValue(const std::string& _key, const std::wstring& _value) {
-	uiAPI::settings::setString(QString::fromStdString(_key), QString::fromStdWString(_value));
-}
-
-// #########################################################################################
-
 void AppBase::loadScripts(void) {
-	aci::InterpreterCore * i = aci::API::core();
-	i->addScriptObject(Settings::instance());
+	InterpreterCore * i = InterpreterCore::instance();
+	i->addScriptObject(aci::Settings::instance());
+	i->addScriptObject(new sCode);
+	i->addScriptObject(new sMerge(this));
+	i->addScriptObject(new sRM);
 
 	// Load custom scripts
-	aci::aDir dir(L"", scriptDirectory());
+	aci::aDir dir("", aci::Settings::instance()->dataPath() + "/Scripts");
 	dir.scanFiles(false);
-	dir.filterFilesWithWhitelist({ L".dll" });
+	dir.filterFilesWithWhitelist({ ".dll" });
 
 	for (auto f : dir.files()) {
 		setColor(QColor(255, 255, 255));
-		print(L"Load library: " + f->name());
-		HINSTANCE hGetProcIDDLL = LoadLibrary(f->fullPath().c_str());
+		print("Load library: " + f->name());
+		HINSTANCE hGetProcIDDLL = LoadLibrary(f->fullPath().toStdWString().c_str());
 
 		if (hGetProcIDDLL) {
 			// resolve function address here
@@ -266,25 +194,25 @@ void AppBase::loadScripts(void) {
 
 				if (ct == 0) {
 					setColor(QColor(255, 150, 50));
-					print(L"  DONE");
+					print("  DONE");
 					setColor(QColor(255, 255, 255));
-					print(L" (no commands loaded)\n");
+					print(" (no commands loaded)\n");
 				}
 				else {
 					setColor(QColor(0, 255, 0));
-					print(L"  SUCCESS");
+					print("  SUCCESS");
 					setColor(QColor(255, 255, 255));
 					print(" (" + QString::number(ct) + " commands loaded)\n");
 				}
 			}
 			else {
 				setColor(QColor(255, 0, 0));
-				print(L"  FAILED (Entry point not found)\n");
+				print("  FAILED (Entry point not found)\n");
 			}
 		}
 		else {
 			setColor(QColor(255, 0, 0));
-			print(L"  FAILED (dll not loaded)\n");
+			print("  FAILED (dll not loaded)\n");
 		}
 	}
 }
@@ -314,14 +242,14 @@ void AppBase::slotHandle(void) {
 	}
 	else {
 		setColor(QColor(150, 150, 255));
-		print(L"\n<: aci@" + aci::API::currentPath() + L" <: ");
+		print("\n<: aci@" + InterpreterCore::instance()->currentPath() + " <: ");
 		setColor(QColor(255, 255, 255));
 		print(cmd + "\n");
-		aci::API::core()->handle(cmd.toStdWString());
+		InterpreterCore::instance()->handle(cmd);
 	}
 
 	m_in->clear();
-	m_inLabel->setText("<: aci@" + QString::fromStdWString(aci::API::core()->currentPath()) + " <: ");
+	m_inLabel->setText("<: aci@" + InterpreterCore::instance()->currentPath() + " <: ");
 	m_in->setFocus();
 	m_commandBuffer.push_back(cmd);
 	m_commandIndex = m_commandBuffer.size() + 1;
@@ -330,18 +258,6 @@ void AppBase::slotHandle(void) {
 void AppBase::slotPrintMessage(const QString& _message) {
 	QTextCursor cursor(m_out->textCursor());
 	m_out->append(_message);
-	//cursor.insertText(_str);
-}
-
-void AppBase::slotSetColor(const QColor& _color) {
-	m_out->moveCursor(QTextCursor::End);
-	QTextCursor cursor(m_out->textCursor());
-
-	QTextCharFormat format = cursor.charFormat();
-	format.setForeground(QBrush(_color));
-	cursor.setCharFormat(format);
-
-	m_out->setTextCursor(cursor);
 }
 
 void AppBase::slotKeyDownOnInpout(QKeyEvent * _event) {
@@ -374,14 +290,14 @@ void AppBase::slotTabPressOnInput(void) {
 	if (m_lastCommand.isEmpty()) { return; }
 	
 	// Get input
-	std::list<std::wstring> lst;
-	aci::API::core()->extractClassicSyntax(lst, m_lastCommand.toStdWString());
+	QStringList lst;
+	InterpreterCore::instance()->extractClassicSyntax(lst, m_lastCommand);
 
 	if (lst.size() == 0) { return; }
-	aci::InterpreterObject * item = aci::API::core()->findFirstMatchingItem(lst.front());
+	aci::InterpreterObject * item = InterpreterCore::instance()->findFirstMatchingItem(lst.front());
 
 	if (item) {
-		if (lst.size() > 1) {
+		if (lst.count() > 1) {
 			
 		}
 	}

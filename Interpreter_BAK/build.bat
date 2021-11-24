@@ -76,12 +76,12 @@ if "%1"=="DEBUG" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
-	"%DEVENV_ROOT%\devenv.exe" "%ACI_UI%\aci.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
+	"%DEVENV_ROOT%\devenv.exe" "%ACI_INTERPRETER%\aci.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT%\devenv.exe" "%ACI_UI%\aci.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
+	"%DEVENV_ROOT%\devenv.exe" "%ACI_INTERPRETER%\aci.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
 ) 
   
 :END

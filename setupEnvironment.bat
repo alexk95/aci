@@ -39,9 +39,10 @@ ELSE (
 SET QTDIR=%QDIR%
 
 REM Set project paths
-SET ACI_INTERPRETER=%ACI_ROOT%\Interpreter
-SET ACI_API=%ACI_ROOT%\API
+SET ACI_UI=%ACI_ROOT%\Interpreter
+SET ACI_CORE=%ACI_ROOT%\Core
 SET ACI_EXAMPLE=%ACI_ROOT%\ScriptExample
+SET ACI_DEFAULT_MERGE=%ACI_ROOT%\DefaultScripts\merge
 
 REM Setup UI Core env
 CALL "%UI_CORE_ROOT%\setupEnvironment.bat"

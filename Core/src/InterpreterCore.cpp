@@ -43,6 +43,7 @@ void InterpreterCore::addScriptObject(aci::InterpreterObject * _obj) {
 		return;
 	}
 	m_objects.insert_or_assign(_obj->key(), _obj);
+	_obj->attachCore(this);
 }
 
 void InterpreterCore::setCurrentPath(const std::wstring& _path) {

@@ -4,6 +4,8 @@
 #pragma warning(disable:4251)
 #endif // ACI_EXPORTS
 
+#include <aci/aciSharedDataTypes.h>
+
 #include <map>
 #include <list>
 #include <string>
@@ -13,7 +15,7 @@ namespace aci {
 	class AbstractPrinter;
 	class InterpreterObject;
 
-	class InterpreterCore {
+	class ACI_API_EXPORT InterpreterCore {
 	public:
 		static InterpreterCore * instance(void);
 		static void clearInstance(void);

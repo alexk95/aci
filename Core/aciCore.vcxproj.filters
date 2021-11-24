@@ -36,9 +36,6 @@
     <ClCompile Include="src\InterpreterObject.cpp">
       <Filter>Source Files\aci</Filter>
     </ClCompile>
-    <ClCompile Include="src\Settings.cpp">
-      <Filter>Source Files\aci</Filter>
-    </ClCompile>
     <ClCompile Include="src\OS.cpp">
       <Filter>Source Files\aci</Filter>
     </ClCompile>
@@ -75,9 +72,6 @@
       <Filter>Header Files\aci</Filter>
     </ClInclude>
     <ClInclude Include="include\aci\InterpreterObject.h">
-      <Filter>Header Files\aci</Filter>
-    </ClInclude>
-    <ClInclude Include="include\aci\Settings.h">
       <Filter>Header Files\aci</Filter>
     </ClInclude>
     <ClInclude Include="include\aci\AbstractOSHandler.h">

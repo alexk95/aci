@@ -9,6 +9,7 @@
 
 namespace aci {
 	class AbstractPrinter;
+	class InterpreterCore;
 
 	class ACI_API_EXPORT InterpreterObject {
 	public:
@@ -40,6 +41,7 @@ namespace aci {
 		// Setter
 
 		void attachPrinter(AbstractPrinter * _printer) { m_printer = _printer; }
+		void attachCore(InterpreterCore * _core) { m_core = _core; }
 
 		void print(const char * _message);
 		void print(const wchar_t * _message);
@@ -77,6 +79,7 @@ namespace aci {
 	protected:
 		virtual void showCommandInfo(void) = 0;
 
+		InterpreterCore *		m_core;
 		AbstractPrinter *		m_printer;
 	};
 }

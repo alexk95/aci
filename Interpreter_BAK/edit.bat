@@ -30,8 +30,9 @@ IF "%SIM_PLAT_ROOT%" == "" (
 REM Setup UI eviroment
 CALL "%ACI_ROOT%\setupEnvironment.bat"
 
+
 ECHO Launching development enviroment
-START "" "%DEVENV_ROOT%\devenv.exe" "%ACI_UI%\aci.vcxproj"
+START "" "%DEVENV_ROOT%\devenv.exe" "%ACI_INTERPRETER%\aci.vcxproj"
 
 :END
 

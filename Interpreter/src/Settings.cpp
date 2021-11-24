@@ -1,16 +1,19 @@
 // aci header
-#include <aci/Settings.h>
+#include "Settings.h"
 #include <aci/aDir.h>
 #include <aci/OS.h>
 
-aci::Settings * g_instance{ nullptr };
+#include <akAPI/uiAPI.h>
+#include <qdir.h>
 
-aci::Settings *  aci::Settings::instance(void) {
+Settings * g_instance{ nullptr };
+
+Settings *  Settings::instance(void) {
 	if (g_instance == nullptr) { g_instance = new Settings; }
 	return g_instance;
 }
 
-void aci::Settings::clearInstance(void) {
+void Settings::clearInstance(void) {
 	if (g_instance) {
 		delete g_instance;
 		g_instance = nullptr;
@@ -21,7 +24,7 @@ void aci::Settings::clearInstance(void) {
 
 // Base class functions
 
-bool aci::Settings::handle(const std::wstring& _command, const std::list<std::wstring>& _params) {
+bool Settings::handle(const std::wstring& _command, const std::list<std::wstring>& _params) {
 	if (_params.size() == 2) {
 		if (_params.back() == L"cfg") {
 			cmdConfiguration();
@@ -32,7 +35,7 @@ bool aci::Settings::handle(const std::wstring& _command, const std::list<std::ws
 		auto it = _params.begin();
 		it++;
 		if (*it == L"data") {
-			aDir d(L"", _params.back());
+			QDir d(QString::fromStdWString(_params.back()));
 			if (!d.exists()) {
 				setColor(255, 0, 0);
 				print(L"The specified directory does not exist\n");
@@ -54,7 +57,7 @@ bool aci::Settings::handle(const std::wstring& _command, const std::list<std::ws
 
 // Command handling
 
-void aci::Settings::cmdConfiguration(void) {
+void Settings::cmdConfiguration(void) {
 	showDelimiterLine();
 	print(L"###  ");
 	print(key());
@@ -70,7 +73,7 @@ void aci::Settings::cmdConfiguration(void) {
 
 // Protected functions
 
-void aci::Settings::showCommandInfo(void) {
+void Settings::showCommandInfo(void) {
 	setColor(255, 150, 50);
 	print("\tcfg                       ");
 	setColor(255, 255, 255);
@@ -86,12 +89,10 @@ void aci::Settings::showCommandInfo(void) {
 
 // Private functions
 
-aci::Settings::Settings() {
-	AbstractOSHandler * os = OS::instance()->handler();
-	m_dataPath = os->getSettingsValue("DataPath", os->currentDirectory());
+Settings::Settings() {
+	m_dataPath = ak::uiAPI::settings::getString("DataPath", QDir::currentPath()).toStdWString();
 }
 
-aci::Settings::~Settings() {
-	AbstractOSHandler * os = OS::instance()->handler();
-	os->setSettingsValue("DataPath", m_dataPath);
+Settings::~Settings() {
+	ak::uiAPI::settings::setString("DataPath", QString::fromStdWString(m_dataPath));
 }

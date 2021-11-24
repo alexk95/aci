@@ -28,7 +28,6 @@
     <ClCompile Include="src\InterpreterCore.cpp" />
     <ClCompile Include="src\InterpreterObject.cpp" />
     <ClCompile Include="src\OS.cpp" />
-    <ClCompile Include="src\Settings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\aci\AbstractInterpreterNotifier.h" />
@@ -43,7 +42,6 @@
     <ClInclude Include="include\aci\InterpreterCore.h" />
     <ClInclude Include="include\aci\InterpreterObject.h" />
     <ClInclude Include="include\aci\OS.h" />
-    <ClInclude Include="include\aci\Settings.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

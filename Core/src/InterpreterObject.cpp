@@ -1,6 +1,5 @@
 #include <aci/InterpreterObject.h>
 #include <aci/AbstractPrinter.h>
-#include <aci/Settings.h>
 #include <aci/aFile.h>
 #include <aci/aDir.h>
 #include <aci/OS.h>
@@ -29,12 +28,12 @@ void aci::InterpreterObject::showDelimiterLine(void) {
 // File operations
 
 bool aci::InterpreterObject::readDataFile(std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog) {
-	std::wstring filePath = Settings::instance()->dataPath() + L"/ScriptData/" + key() + L"/" + _filename;
+	std::wstring filePath = OS::instance()->handler()->scriptDirectory() + L"/" + key() + L"/" + _filename;
 	return OS::instance()->handler()->readLinesFromFile(_data, filePath);
 }
 
 bool aci::InterpreterObject::writeDataFile(const std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog) {
-	std::wstring filePath = Settings::instance()->dataPath() + L"/ScriptData/" + key() + L"/" + _filename;
+	std::wstring filePath = OS::instance()->handler()->scriptDirectory() + L"/" + key() + L"/" + _filename;
 	for (size_t i{ 0 }; i < filePath.length(); i++) {
 		if (filePath.at(i) == L'\\') { filePath.replace(i, 1, L"/"); }
 	}

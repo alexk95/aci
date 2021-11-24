@@ -12,16 +12,27 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AdditionalOperators.cpp" />
+    <ClCompile Include="src\aDir.cpp" />
+    <ClCompile Include="src\aFile.cpp" />
     <ClCompile Include="src\AppBase.cpp" />
+    <ClCompile Include="src\InterpreterCore.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Settings.cpp" />
+    <ClCompile Include="src\sCode.cpp" />
+    <ClCompile Include="src\sMerge.cpp" />
+    <ClCompile Include="src\sRM.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\AbstractInterpreterNotifier.h" />
     <ClInclude Include="include\globalDatatypes.h" />
-    <ClInclude Include="include\Settings.h" />
+    <ClInclude Include="include\sRM.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="include\AdditionalOperators.h" />
+    <ClInclude Include="include\aDir.h" />
+    <ClInclude Include="include\aFile.h" />
+    <ClInclude Include="include\sCode.h" />
+    <QtMoc Include="include\sMerge.h" />
     <QtMoc Include="include\AppBase.h" />
+    <ClInclude Include="include\InterpreterCore.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="aci.rc" />
@@ -73,11 +84,11 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(UICORE_ENV_INC);$(Qt_INCLUDEPATH_);$(ACI_CORE)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UICORE_ENV_INC);$(Qt_INCLUDEPATH_);$(ACI_API)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(UICORE_ENV_LIBD_ROOT);$(Qt_LIBPATH_);$(ACI_CORE)\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(UICORE_ENV_LIBD_INP);$(Qt_LIBS_);aciCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(UICORE_ENV_LIBD_ROOT);$(Qt_LIBPATH_);$(ACI_API)\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(UICORE_ENV_LIBD_INP);$(Qt_LIBS_);aciAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy $(MSBuildProjectDirectory)\qt.conf $(OutputPath)</Command>
@@ -88,11 +99,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
-      <AdditionalLibraryDirectories>$(UICORE_ENV_LIB_ROOT);$(Qt_LIBPATH_);$(ACI_CORE)\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(UICORE_ENV_LIB_INP);$(Qt_LIBS_);aciCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(UICORE_ENV_LIB_ROOT);$(Qt_LIBPATH_);$(ACI_API)\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(UICORE_ENV_LIB_INP);$(Qt_LIBS_);aciAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(UICORE_ENV_INC);$(Qt_INCLUDEPATH_);$(ACI_CORE)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UICORE_ENV_INC);$(Qt_INCLUDEPATH_);$(ACI_API)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <CustomBuildStep>
       <Command>copy $(MSBuildProjectDirectory)\qt.conf $(OutputPath)</Command>

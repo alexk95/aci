@@ -1,9 +1,10 @@
 #pragma once
 
+#include <aci/aciSharedDataTypes.h>
 #include <aci/AbstractOSHandler.h>
 
 namespace aci {
-	class OS {
+	class ACI_API_EXPORT OS {
 	public:
 		static OS * instance(void);
 		static void clearInstance(void);

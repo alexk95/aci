@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.902
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aci", "aci.vcxproj", "{50693BD9-85AF-4AA6-A3DE-A45D20EF9016}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aciCore", "aciCore.vcxproj", "{50693BD9-85AF-4AA6-A3DE-A45D20EF9016}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +26,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {7F073D60-8B74-4B62-BDA1-11AA92EA12E9}
+		SolutionGuid = {DBE88022-8C8D-4BFC-8CB2-D3F2E00BECC7}
 	EndGlobalSection
 EndGlobal

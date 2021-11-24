@@ -1,7 +1,8 @@
 #pragma once
 
 #include <aci/AbstractPrinter.h>
-#include "AbstractInterpreterNotifier.h"
+#include <aci/AbstractInterpreterNotifier.h>
+#include <aci/AbstractOSHandler.h>
 
 // uiCore header
 #include <akCore/globalDataTypes.h>		// UID type
@@ -32,7 +33,7 @@ namespace ak {
 //! This class is managing the UI
 //! We derive from aWindowEventHandler to be able to register this class as a
 //! window event handler for the main window
-class AppBase : public QObject, public ak::aWindowEventHandler, public aci::AbstractPrinter, public AbstractInterpreterNotifier
+class AppBase : public QObject, public ak::aWindowEventHandler, public aci::AbstractPrinter, public aci::AbstractInterpreterNotifier, public aci::AbstractOSHandler
 {
 	Q_OBJECT
 public:
@@ -43,15 +44,42 @@ public:
 	//! @brief Deconstructor
 	virtual ~AppBase();
 	
+	// ##################################################################################################
+
+	// Base class functions
+
 	//! @brief This function will be called when the window is about to close
 	//! If return false then the window will not be closed
 	virtual bool closeEvent(void) override;
-
-	virtual void setColor(const QColor& _color) override;
-
-	virtual void print(const QString& _str) override;
-
 	virtual void shutdown(void) override;
+
+	virtual void print(const std::string& _str) override;
+	virtual void print(const std::wstring& _str) override;
+	void print(const QString& _str);
+	virtual void printAsync(const std::string& _str) override;
+	virtual void printAsync(const std::wstring& _str) override;
+	void printAsync(const QString& _str);
+
+	virtual void setColor(const aci::Color& _color) override;
+	virtual void setColorAsync(const aci::Color& _color) override;
+	void setColor(const QColor& _color);
+	void setColorAsync(const QColor& _color);
+
+	virtual bool fileExists(const std::wstring& _path) override;
+	virtual bool deleteFile(const std::wstring& _path) override;
+	virtual bool readLinesFromFile(std::list<std::wstring>& _data, const std::wstring& _path) override;
+	virtual bool writeLinesToFile(const std::list<std::wstring>& _data, const std::wstring& _path) override;
+
+	virtual bool directoryExists(const std::wstring& _path) override;
+	virtual std::list<std::wstring> filesInDirectory(const std::wstring& _path, bool _searchTopLevelDirectoryOnly) override;
+	virtual std::list<std::wstring> subdirectories(const std::wstring& _path, bool _searchTopLevelDirectoryOnly) override;
+	virtual std::wstring currentDirectory(void) override;
+	virtual std::wstring scriptDirectory(void) override;
+
+	virtual std::wstring getSettingsValue(const std::string& _key, const std::wstring& _defaultValue = std::wstring()) override;
+	virtual void setSettingsValue(const std::string& _key, const std::wstring& _value) override;
+
+	// ##################################################################################################
 
 	void loadScripts(void);
 
@@ -61,6 +89,7 @@ private slots:
 	void slotHandle(void);
 
 	void slotPrintMessage(const QString& _message);
+	void slotSetColor(const QColor& _color);
 
 	void slotKeyDownOnInpout(QKeyEvent * _event);
 
