@@ -13,7 +13,9 @@ namespace aci {
 
 		virtual bool fileExists(const std::wstring& _path) = 0;
 		virtual bool deleteFile(const std::wstring& _path) = 0;
+		virtual bool readFile(const std::wstring& _data, const std::wstring& _path) = 0;
 		virtual bool readLinesFromFile(std::list<std::wstring>& _data, const std::wstring& _path) = 0;
+		virtual bool writeFile(const std::wstring& _data, const std::wstring& _path) = 0;
 		virtual bool writeLinesToFile(const std::list<std::wstring>& _data, const std::wstring& _path) = 0;
 
 		virtual bool directoryExists(const std::wstring& _path) = 0;

@@ -3,11 +3,13 @@
 #include <aci/aciSharedDataTypes.h>
 
 #include <string>
+#include <list>
 
 namespace aci {
 
-	class ACI_API_EXPORT InterpreterCore;
-
+	class ExternalDllScript;
+	class InterpreterCore;
+	
 	class ScriptLoader {
 	public:
 		ScriptLoader(InterpreterCore * _core);
@@ -17,7 +19,9 @@ namespace aci {
 		void loadDllsFromDirectory(const std::wstring& _directoryPath);
 
 	private:
-		InterpreterCore *		m_core;
+		
+		std::list<ExternalDllScript *>	m_externalDlls;
+		InterpreterCore *				m_core;
 
 		ScriptLoader() = delete;
 		ScriptLoader(ScriptLoader&) = delete;

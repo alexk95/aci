@@ -61,7 +61,7 @@ void aDir::scanDirectories(bool _scanSubdirectories) {
 	AbstractOSHandler * os = OS::instance()->handler();
 	for (auto s : os->subdirectories(fullPath(), true)) {
 		aDir * newSub = new aDir(s, fullPath() + L"/" + s);
-		if (_scanSubdirectories) { newSub->scanDirectories(true); }
+		if (_scanSubdirectories && s != L"." && s != L"..") { newSub->scanDirectories(true); }
 		m_subDirectories.push_back(newSub);
 	}
 }

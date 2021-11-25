@@ -10,6 +10,7 @@
 namespace aci {
 	class AbstractPrinter;
 	class InterpreterCore;
+	class AbstractInterpreterNotifier;
 
 	class ACI_API_EXPORT InterpreterObject {
 	public:
@@ -32,8 +33,10 @@ namespace aci {
 
 		// File operations
 
+		bool readDataFile(std::wstring& _data, const std::wstring& _filename, bool _showLog);
 		bool readDataFile(std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog);
 
+		bool writeDataFile(const std::wstring& _data, const std::wstring& _filename, bool _showLog);
 		bool writeDataFile(const std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog);
 
 		// ################################################################################################################################
@@ -42,6 +45,12 @@ namespace aci {
 
 		void attachPrinter(AbstractPrinter * _printer) { m_printer = _printer; }
 		void attachCore(InterpreterCore * _core) { m_core = _core; }
+		void attachNotifier(AbstractInterpreterNotifier * _notifier) { m_notifier = _notifier; }
+
+		void disableInput(void);
+		void queueDisableInput(void);
+		void enableInput(void);
+		void queueEnableInput(void);
 
 		void print(const char * _message);
 		void print(const wchar_t * _message);
@@ -79,7 +88,8 @@ namespace aci {
 	protected:
 		virtual void showCommandInfo(void) = 0;
 
-		InterpreterCore *		m_core;
-		AbstractPrinter *		m_printer;
+		InterpreterCore *				m_core;
+		AbstractPrinter *				m_printer;
+		AbstractInterpreterNotifier *	m_notifier;
 	};
 }

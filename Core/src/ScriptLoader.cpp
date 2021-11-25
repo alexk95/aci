@@ -1,9 +1,7 @@
 #include <aci/ScriptLoader.h>
 #include <aci/InterpreterCore.h>
 #include <aci/AbstractPrinter.h>
-
-#include <Windows.h>
-
+#include <aci/ExternalDllScript.h>
 
 aci::ScriptLoader::ScriptLoader(InterpreterCore * _core) : m_core(_core) {}
 
@@ -17,15 +15,17 @@ void aci::ScriptLoader::loadDll(const std::wstring& _path, const std::wstring& _
 	HINSTANCE hGetProcIDDLL = LoadLibrary(_path.c_str());
 
 	if (hGetProcIDDLL) {
-		// resolve function address here
-		f_generateObjects func = (f_generateObjects)GetProcAddress(hGetProcIDDLL, "generateObjects");
+		// Resolve function address here
+		ExternalDllScript::DLLGenerateObjectsFunctionType func = (ExternalDllScript::DLLGenerateObjectsFunctionType)GetProcAddress(hGetProcIDDLL, "generateObjects");
 		if (func) {
 			int objCt{ 0 };
 			aci::InterpreterObject ** obj = func(objCt);
 			int ct{ 0 };
+			
 			for (int o{ 0 }; o < objCt; o++) {
 				if (obj[o]) {
-					i->addScriptObject(obj[o]);
+					ExternalDllScript * newScript = new ExternalDllScript(hGetProcIDDLL, func, obj[o]);
+					m_core->addScriptObject(obj[o]);
 					ct++;
 				}
 			}

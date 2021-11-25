@@ -7,6 +7,7 @@
 #include <aci/InterpreterCore.h>
 #include <aci/aDir.h>
 #include <aci/aFile.h>
+#include <aci/ScriptLoader.h>
 
 // AK header
 #include <akAPI/uiAPI.h>		// The uiAPI
@@ -239,54 +240,8 @@ void AppBase::setSettingsValue(const std::string& _key, const std::wstring& _val
 void AppBase::loadScripts(void) {
 	aci::InterpreterCore * i = aci::API::core();
 	i->addScriptObject(Settings::instance());
-
-	// Load custom scripts
-	aci::aDir dir(L"", scriptDirectory());
-	dir.scanFiles(false);
-	dir.filterFilesWithWhitelist({ L".dll" });
-
-	for (auto f : dir.files()) {
-		setColor(QColor(255, 255, 255));
-		print(L"Load library: " + f->name());
-		HINSTANCE hGetProcIDDLL = LoadLibrary(f->fullPath().c_str());
-
-		if (hGetProcIDDLL) {
-			// resolve function address here
-			f_generateObjects func = (f_generateObjects)GetProcAddress(hGetProcIDDLL, "generateObjects");
-			if (func) {
-				int objCt{ 0 };
-				aci::InterpreterObject ** obj = func(objCt);
-				int ct{ 0 };
-				for (int o{ 0 }; o < objCt; o++) {
-					if (obj[o]) {
-						i->addScriptObject(obj[o]);
-						ct++;
-					}
-				}
-
-				if (ct == 0) {
-					setColor(QColor(255, 150, 50));
-					print(L"  DONE");
-					setColor(QColor(255, 255, 255));
-					print(L" (no commands loaded)\n");
-				}
-				else {
-					setColor(QColor(0, 255, 0));
-					print(L"  SUCCESS");
-					setColor(QColor(255, 255, 255));
-					print(" (" + QString::number(ct) + " commands loaded)\n");
-				}
-			}
-			else {
-				setColor(QColor(255, 0, 0));
-				print(L"  FAILED (Entry point not found)\n");
-			}
-		}
-		else {
-			setColor(QColor(255, 0, 0));
-			print(L"  FAILED (dll not loaded)\n");
-		}
-	}
+	aci::API::core()->scriptLoader()->loadDllsFromDirectory(scriptDirectory());
+	aci::API::core()->scriptLoader()->loadDllsFromDirectory(QString(qgetenv("ACI_DEFAULT_MERGE") + "\\x64\\Debug\\").toStdWString());
 }
 
 void AppBase::setInputEnabled(bool _isEnabled) {

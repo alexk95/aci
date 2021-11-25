@@ -25,6 +25,7 @@
     <ClCompile Include="src\Color.cpp" />
     <ClCompile Include="src\Convert.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\ExternalDllScript.cpp" />
     <ClCompile Include="src\InterpreterCore.cpp" />
     <ClCompile Include="src\InterpreterObject.cpp" />
     <ClCompile Include="src\OS.cpp" />
@@ -40,6 +41,7 @@
     <ClInclude Include="include\aci\API.h" />
     <ClInclude Include="include\aci\Color.h" />
     <ClInclude Include="include\aci\Convert.h" />
+    <ClInclude Include="include\aci\ExternalDllScript.h" />
     <ClInclude Include="include\aci\InterpreterCore.h" />
     <ClInclude Include="include\aci\InterpreterObject.h" />
     <ClInclude Include="include\aci\OS.h" />

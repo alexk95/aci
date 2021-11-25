@@ -4,8 +4,9 @@
 #include <aci/aDir.h>
 #include <aci/OS.h>
 #include <aci/Convert.h>
+#include <aci/AbstractInterpreterNotifier.h>
 
-aci::InterpreterObject::InterpreterObject() : m_printer(nullptr) {}
+aci::InterpreterObject::InterpreterObject() : m_printer(nullptr), m_core(nullptr), m_notifier(nullptr) {}
 
 // ################################################################################################################################
 
@@ -27,9 +28,22 @@ void aci::InterpreterObject::showDelimiterLine(void) {
 
 // File operations
 
+bool aci::InterpreterObject::readDataFile(std::wstring& _data, const std::wstring& _filename, bool _showLog) {
+	std::wstring filePath = OS::instance()->handler()->scriptDirectory() + L"/" + key() + L"/" + _filename;
+	return OS::instance()->handler()->readFile(_data, filePath);
+}
+
 bool aci::InterpreterObject::readDataFile(std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog) {
 	std::wstring filePath = OS::instance()->handler()->scriptDirectory() + L"/" + key() + L"/" + _filename;
 	return OS::instance()->handler()->readLinesFromFile(_data, filePath);
+}
+
+bool aci::InterpreterObject::writeDataFile(const std::wstring& _data, const std::wstring& _filename, bool _showLog) {
+	std::wstring filePath = OS::instance()->handler()->scriptDirectory() + L"/" + key() + L"/" + _filename;
+	for (size_t i{ 0 }; i < filePath.length(); i++) {
+		if (filePath.at(i) == L'\\') { filePath.replace(i, 1, L"/"); }
+	}
+	return OS::instance()->handler()->writeFile(_data, filePath);
 }
 
 bool aci::InterpreterObject::writeDataFile(const std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog) {
@@ -43,6 +57,26 @@ bool aci::InterpreterObject::writeDataFile(const std::list<std::wstring>& _data,
 // ################################################################################################################################
 
 // Setter
+
+void aci::InterpreterObject::disableInput(void) {
+	if (m_notifier) {
+		m_notifier->disableInput();
+	}
+}
+
+void aci::InterpreterObject::queueDisableInput(void) {
+	if (m_notifier) { m_notifier->disableInputAsync(); }
+}
+
+void aci::InterpreterObject::enableInput(void) {
+	if (m_notifier) {
+		m_notifier->enableInput();
+	}
+}
+
+void aci::InterpreterObject::queueEnableInput(void) {
+	if (m_notifier) { m_notifier->enableInputAsync(); }
+}
 
 void aci::InterpreterObject::print(const char * _message) { print(std::string(_message)); }
 void aci::InterpreterObject::print(const wchar_t * _message) { print(std::wstring(_message)); }

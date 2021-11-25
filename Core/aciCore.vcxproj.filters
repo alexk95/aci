@@ -51,6 +51,9 @@
     <ClCompile Include="src\ScriptLoader.cpp">
       <Filter>Source Files\aci</Filter>
     </ClCompile>
+    <ClCompile Include="src\ExternalDllScript.cpp">
+      <Filter>Source Files\aci</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\aci\aciSharedDataTypes.h">
@@ -90,6 +93,9 @@
       <Filter>Header Files\aci</Filter>
     </ClInclude>
     <ClInclude Include="include\aci\ScriptLoader.h">
+      <Filter>Header Files\aci</Filter>
+    </ClInclude>
+    <ClInclude Include="include\aci\ExternalDllScript.h">
       <Filter>Header Files\aci</Filter>
     </ClInclude>
   </ItemGroup>
