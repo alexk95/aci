@@ -86,12 +86,28 @@ void aci::InterpreterObject::queuePrint(const wchar_t * _message) { queuePrint(s
 
 
 void aci::InterpreterObject::print(bool _value) {
-	if (_value) { print(L"TRUE"); }
-	else { print(L"FALSE"); }
+	if (_value) {
+		setColor(0, 255, 0);
+		print(L"TRUE");
+		setColor(255, 255, 255);
+	}
+	else {
+		setColor(0, 255, 0);
+		print(L"FALSE");
+		setColor(255, 255, 255);
+	}
 }
 void aci::InterpreterObject::queuePrint(bool _value) {
-	if (_value) { queuePrint(L"TRUE"); }
-	else { queuePrint(L"FALSE"); }
+	if (_value) {
+		queueColor(0, 255, 0);
+		queuePrint(L"TRUE");
+		queueColor(255, 255, 255);
+	}
+	else {
+		queueColor(0, 255, 0);
+		queuePrint(L"FALSE");
+		queueColor(255, 255, 255);
+	}
 }
 
 void aci::InterpreterObject::print(const std::string& _message) {
