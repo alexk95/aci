@@ -28,7 +28,7 @@ REM Setup UI eviroment
 CALL "%ACI_ROOT%\setupEnvironment.bat"
 
 ECHO Launching development enviroment
-START "" "%DEVENV_ROOT%\devenv.exe" "%ACI_UI%\aci.vcxproj"
+START "" "%DEVENV_ROOT%\devenv.exe" "%ACI_CORE%\aciCore.vcxproj"
 
 :END
 

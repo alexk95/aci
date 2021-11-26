@@ -19,12 +19,9 @@ IF "%UI_CORE_ROOT%" == "" (
 	goto END
 )
 
-REM Set Qt Environment
-IF "%SIM_PLAT_ROOT%" == "" (
-    IF "%QDIR%" == "" (
-        ECHO Please specify the following environment variable: QDIR
-        goto END
-    )
+IF "%QTDIR_ROOT%" == "" (
+	ECHO Please specify the following environment variables: QTDIR_ROOT
+	goto END
 )
 
 REM Setup UI eviroment

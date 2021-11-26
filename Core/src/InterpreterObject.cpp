@@ -1,4 +1,5 @@
 #include <aci/InterpreterObject.h>
+#include <aci/InterpreterCore.h>
 #include <aci/AbstractPrinter.h>
 #include <aci/aFile.h>
 #include <aci/aDir.h>
@@ -29,17 +30,17 @@ void aci::InterpreterObject::showDelimiterLine(void) {
 // File operations
 
 bool aci::InterpreterObject::readDataFile(std::wstring& _data, const std::wstring& _filename, bool _showLog) {
-	std::wstring filePath = OS::instance()->handler()->scriptDirectory() + L"/" + key() + L"/" + _filename;
+	std::wstring filePath = OS::instance()->handler()->scriptDataDirectory() + L"/" + key() + L"/" + _filename;
 	return OS::instance()->handler()->readFile(_data, filePath);
 }
 
 bool aci::InterpreterObject::readDataFile(std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog) {
-	std::wstring filePath = OS::instance()->handler()->scriptDirectory() + L"/" + key() + L"/" + _filename;
+	std::wstring filePath = OS::instance()->handler()->scriptDataDirectory() + L"/" + key() + L"/" + _filename;
 	return OS::instance()->handler()->readLinesFromFile(_data, filePath);
 }
 
 bool aci::InterpreterObject::writeDataFile(const std::wstring& _data, const std::wstring& _filename, bool _showLog) {
-	std::wstring filePath = OS::instance()->handler()->scriptDirectory() + L"/" + key() + L"/" + _filename;
+	std::wstring filePath = OS::instance()->handler()->scriptDataDirectory() + L"/" + key() + L"/" + _filename;
 	for (size_t i{ 0 }; i < filePath.length(); i++) {
 		if (filePath.at(i) == L'\\') { filePath.replace(i, 1, L"/"); }
 	}
@@ -47,7 +48,7 @@ bool aci::InterpreterObject::writeDataFile(const std::wstring& _data, const std:
 }
 
 bool aci::InterpreterObject::writeDataFile(const std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog) {
-	std::wstring filePath = OS::instance()->handler()->scriptDirectory() + L"/" + key() + L"/" + _filename;
+	std::wstring filePath = OS::instance()->handler()->scriptDataDirectory() + L"/" + key() + L"/" + _filename;
 	for (size_t i{ 0 }; i < filePath.length(); i++) {
 		if (filePath.at(i) == L'\\') { filePath.replace(i, 1, L"/"); }
 	}
@@ -122,14 +123,22 @@ void aci::InterpreterObject::queueColor(const Color& _color) {
 
 // Getter
 
-std::list<std::wstring> aci::InterpreterObject::filesInDirectory(const std::wstring& _subdirectory) {
+std::list<std::wstring> aci::InterpreterObject::filesInDirectory(const std::wstring& _directoryPath) {
 	AbstractOSHandler * os = OS::instance()->handler();
-	return os->filesInDirectory(_subdirectory, true);
+	return os->filesInDirectory(_directoryPath, true);
+}
+std::list<std::wstring> aci::InterpreterObject::filesInDataDirectory(const std::wstring& _subdirectory) {
+	AbstractOSHandler * os = OS::instance()->handler();
+	return os->filesInDirectory(os->scriptDataDirectory() + L"/" + key() + L"/" + _subdirectory, true);
 }
 
-std::list<std::wstring> aci::InterpreterObject::subdirectories(const std::wstring& _subdirectory) {
+std::list<std::wstring> aci::InterpreterObject::subdirectories(const std::wstring& _directoryPath) {
 	AbstractOSHandler * os = OS::instance()->handler();
-	return os->subdirectories(_subdirectory, true);
+	return os->subdirectories(_directoryPath, true);
+}
+std::list<std::wstring> aci::InterpreterObject::subdirectoriesInDataDirectory(const std::wstring& _subdirectory) {
+	AbstractOSHandler * os = OS::instance()->handler();
+	return os->subdirectories(os->scriptDataDirectory() + L"/" + key() + L"/" + _subdirectory, true);
 }
 
 // ################################################################################################################################
@@ -144,9 +153,12 @@ std::wstring aci::InterpreterObject::isolateFilename(const std::wstring& _path) 
 	std::list<std::wstring> lst = splitString(path, L"/");
 	std::list<std::wstring> filename = splitString(lst.back(), L".");
 	std::wstring file;
+	size_t ct{ 0 };
 	for (auto f : filename) {
-		if (!file.empty()) { file.append(L"."); }
-		file.append(f);
+		if (++ct != filename.size()) {
+			if (!file.empty()) { file.append(L"."); }
+			file.append(f);
+		}
 	}
 	return file;
 }

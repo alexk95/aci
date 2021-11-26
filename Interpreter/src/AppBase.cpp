@@ -110,12 +110,25 @@ AppBase::AppBase(int _argc, char ** _argv)
 
 	m_inLabel->setStyleSheet("#a_inputLabel{color: #40ff40;}");
 
+	print(L"Initializing...\n");
+	print(L"UI starting at: " + QDir::currentPath().toStdWString() + L"\n");
+
 	// Start interpreter
+	print(L"Initialize interpreter\n");
 	aci::API::initialize(this, this, this);
+	print(L"Update data path\n\n");
 	aci::API::setCurrentPath(Settings::instance()->dataPath());
+	print(L"Load external scripts\n");
 	loadScripts();
 
+	print(L"\nWelcome\n");
+
 	m_inLabel->setText("<: aci@" + QString::fromStdWString(aci::API::currentPath()) + " <: ");
+
+	setColor(aci::Color(150, 150, 255));
+	print("<: aci@" + QString::fromStdWString(aci::API::currentPath()) + " <: ");
+	setColor(QColor(255, 255, 255));
+	print(QString("Use \"Welcome\n"));
 
 	setColor(aci::Color(150, 150, 255));
 	print("<: aci@" + QString::fromStdWString(aci::API::currentPath()) + " <: ");
@@ -141,6 +154,19 @@ AppBase::~AppBase() {
 bool AppBase::closeEvent(void) {
 	uiAPI::settings::setBool("Fullscreen", m_mainWindow->window()->isMaximized());
 	return true;
+}
+
+void AppBase::disableInput(void) {
+	setInputEnabled(false);
+}
+void AppBase::disableInputAsync(void) {
+	QMetaObject::invokeMethod(this, "slotSetInputEnabled", Qt::QueuedConnection, Q_ARG(bool, false));
+}
+void AppBase::enableInput(void) {
+	setInputEnabled(true);
+}
+void AppBase::enableInputAsync(void) {
+	QMetaObject::invokeMethod(this, "slotSetInputEnabled", Qt::QueuedConnection, Q_ARG(bool, true));
 }
 
 void AppBase::shutdown(void) {
@@ -170,6 +196,18 @@ bool AppBase::deleteFile(const std::wstring& _path) {
 	return true;
 }
 
+bool AppBase::readFile(std::wstring& _data, const std::wstring& _path) {
+	QFile file(QString::fromStdWString(_path));
+	if (!file.exists()) {
+		assert(0);
+		return false;
+	}
+	if (!file.open(QIODevice::ReadOnly)) { assert(0); return false; }
+	_data = QString(file.readAll()).toStdWString();
+	file.close();
+	return true;
+}
+
 bool AppBase::readLinesFromFile(std::list<std::wstring>& _data, const std::wstring& _path) {
 	QFile file(QString::fromStdWString(_path));
 	if (!file.exists()) { assert(0); return false; }
@@ -182,7 +220,35 @@ bool AppBase::readLinesFromFile(std::list<std::wstring>& _data, const std::wstri
 	return true;
 }
 
+bool AppBase::writeFile(const std::wstring& _data, const std::wstring& _path) {
+	QStringList lst = QString::fromStdWString(_path).replace("\\", "/").split("/");
+	QString dir;
+	for (int p{ 0 }; p < lst.count() - 1; p++) {
+		if (!dir.isEmpty()) { dir.append("/"); }
+		dir.append(lst[p]);
+		if (!QDir(dir).exists()) {
+			if (!QDir().mkdir(dir)) { assert(0); return false; }
+		}
+	}
+
+	QFile file(QString::fromStdWString(_path));
+	if (!file.open(QIODevice::WriteOnly)) { assert(0); return false; }
+	file.write(QByteArray().append(QString::fromStdWString(_data)));
+	file.close();
+	return true;
+}
+
 bool AppBase::writeLinesToFile(const std::list<std::wstring>& _data, const std::wstring& _path) {
+	QStringList lst = QString::fromStdWString(_path).replace("\\", "/").split("/");
+	QString dir;
+	for (int p{ 0 }; p < lst.count() - 1; p++) {
+		if (!dir.isEmpty()) { dir.append("/"); }
+		dir.append(lst[p]);
+		if (!QDir(dir).exists()) {
+			if (!QDir().mkdir(dir)) { assert(0); return false; }
+		}
+	}
+
 	QFile file(QString::fromStdWString(_path));
 	if (!file.open(QIODevice::WriteOnly)) { assert(0); return false; }
 	QTextStream stream(&file);
@@ -202,7 +268,9 @@ std::list<std::wstring> AppBase::filesInDirectory(const std::wstring& _path, boo
 	std::list<std::wstring> ret;
 	if (dir.exists()) {
 		for (auto entry : dir.entryList(QDir::Filter::Files)) {
-			ret.push_back(entry.toStdWString());
+			if (entry != "." && entry != "..") {
+				ret.push_back(entry.toStdWString());
+			}
 		}
 	}
 	return ret;
@@ -213,7 +281,9 @@ std::list<std::wstring> AppBase::subdirectories(const std::wstring& _path, bool 
 	std::list<std::wstring> ret;
 	if (dir.exists()) {
 		for (auto entry : dir.entryList(QDir::Filter::Dirs)) {
-			ret.push_back(entry.toStdWString());
+			if (entry != "." && entry != "..") {
+				ret.push_back(entry.toStdWString());
+			}
 		}
 	}
 	return ret;
@@ -223,7 +293,7 @@ std::wstring AppBase::currentDirectory(void) {
 	return QDir::currentPath().toStdWString();
 }
 
-std::wstring AppBase::scriptDirectory(void) {
+std::wstring AppBase::scriptDataDirectory(void) {
 	return Settings::instance()->dataPath() + L"/ScriptData";
 }
 
@@ -239,9 +309,13 @@ void AppBase::setSettingsValue(const std::string& _key, const std::wstring& _val
 
 void AppBase::loadScripts(void) {
 	aci::InterpreterCore * i = aci::API::core();
+	print(L"Adding settings as a script\n");
 	i->addScriptObject(Settings::instance());
-	aci::API::core()->scriptLoader()->loadDllsFromDirectory(scriptDirectory());
-	aci::API::core()->scriptLoader()->loadDllsFromDirectory(QString(qgetenv("ACI_DEFAULT_MERGE") + "\\x64\\Debug\\").toStdWString());
+	print(L"Load *.dll scripts from " + Settings::instance()->dataPath() + L"/Scripts\n");
+	aci::API::core()->scriptLoader()->loadDllsFromDirectory(Settings::instance()->dataPath() + L"/Scripts");
+
+	//print(L"Load merge script\n");
+	//aci::API::core()->scriptLoader()->loadDllsFromDirectory(QString(qgetenv("ACI_DEFAULT_MERGE") + "\\x64\\Debug\\").toStdWString());
 }
 
 void AppBase::setInputEnabled(bool _isEnabled) {
@@ -280,6 +354,10 @@ void AppBase::slotHandle(void) {
 	m_in->setFocus();
 	m_commandBuffer.push_back(cmd);
 	m_commandIndex = m_commandBuffer.size() + 1;
+}
+
+void AppBase::slotSetInputEnabled(bool _enabled) {
+	setInputEnabled(_enabled);
 }
 
 void AppBase::slotPrintMessage(const QString& _message) {

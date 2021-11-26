@@ -8,12 +8,10 @@
 
 #include <list>
 
-class AppBase;
-
-class sMerge : public aci::InterpreterObject {
+class MERGE_EXPORT merge : public aci::InterpreterObject {
 public:
-	sMerge(AppBase * _app);
-	virtual ~sMerge();
+	merge(void);
+	virtual ~merge();
 
 	virtual std::wstring key(void) const override { return L"merge"; }
 
@@ -54,9 +52,9 @@ private:
 
 	bool checkFileContent(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix);
 
-	AppBase *				m_app;
 	std::wstring			m_pathOne;
 	std::wstring			m_pathTwo;
+	std::wstring			m_prefix;
 	bool					m_searchTopDirectoryOnly;
 	bool					m_autoMerge;
 
@@ -69,4 +67,7 @@ private:
 	bool					m_whiteListFActive;
 	std::list<std::wstring>	m_blackListF;
 	std::list<std::wstring>	m_whiteListF;
+
+	merge(merge&) = delete;
+	merge& operator = (merge&) = delete;
 };

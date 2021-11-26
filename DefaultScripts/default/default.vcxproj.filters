@@ -19,21 +19,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\merge_global.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\AdditionalOperators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\merge.h">
+    <ClInclude Include="include\default_global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\merge.cpp">
+    <ClCompile Include="src\AdditionalOperators.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\AdditionalOperators.cpp">
+    <ClCompile Include="src\rm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\aciAPIFunctions.cpp">

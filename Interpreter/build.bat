@@ -3,6 +3,7 @@ REM This script requires the following environment variables to be set:
 REM 1. ACI_ROOT
 REM 2. DEVENV_ROOT
 REM 3. UI_CORE_ROOT
+REM 4. QTDIR_ROOT
 
 IF "%ACI_ROOT%" == "" (
 	ECHO Please specify the following environment variables: ACI_ROOT
@@ -19,12 +20,9 @@ IF "%UI_CORE_ROOT%" == "" (
 	goto END
 )
 
-REM Set Qt Environment
-IF "%SIM_PLAT_ROOT%" == "" (
-    IF "%QDIR%" == "" (
-        ECHO Please specify the following environment variable: QDIR
-        goto END
-    )
+IF "%QTDIR_ROOT%" == "" (
+	ECHO Please specify the following environment variables: QTDIR_ROOT
+	goto END
 )
 
 REM Setup UI eviroment
@@ -53,25 +51,6 @@ SET TYPE_NAME=REBUILD
 IF "%2"=="BUILD" (
 	SET TYPE=/Build
 	SET TYPE_NAME=BUILD
-)
-
-REM Clean up the build logs
-if "%1"=="" (
-	DEL buildLog_Debug.txt
-	DEL buildLog_Release.txt
-)
-	
-if "%1"=="BOTH" (
-	DEL buildLog_Debug.txt
-	DEL buildLog_Release.txt
-)
-	
-if "%1"=="RELEASE" (
-	DEL buildLog_Release.txt
-)
-	
-if "%1"=="DEBUG" (
-	DEL buildLog_Debug.txt
 )
 
 IF %DEBUG%==1 (

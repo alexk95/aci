@@ -2,6 +2,8 @@
 #include <aci/InterpreterCore.h>
 #include <aci/AbstractPrinter.h>
 #include <aci/ExternalDllScript.h>
+#include <aci/aDir.h>
+#include <aci/aFile.h>
 
 aci::ScriptLoader::ScriptLoader(InterpreterCore * _core) : m_core(_core) {}
 
@@ -11,7 +13,7 @@ aci::ScriptLoader::~ScriptLoader() {
 
 void aci::ScriptLoader::loadDll(const std::wstring& _path, const std::wstring& _filename) {
 	m_core->printer()->setColor(255, 255, 255);
-	m_core->printer()->print(L"Load library: " + _filename);
+	m_core->printer()->print(L"[script loader] Load library: " + _filename);
 	HINSTANCE hGetProcIDDLL = LoadLibrary(_path.c_str());
 
 	if (hGetProcIDDLL) {
@@ -55,5 +57,13 @@ void aci::ScriptLoader::loadDll(const std::wstring& _path, const std::wstring& _
 }
 
 void aci::ScriptLoader::loadDllsFromDirectory(const std::wstring& _directoryPath) {
+	m_core->printer()->print(L"[script loader] Searching for files at: " + _directoryPath + L"\n");
+	aDir directory(L"", _directoryPath);
+	directory.scanFiles(false);
+	m_core->printer()->print(L"[script loader] Filter for *.dll files\n");
+	directory.filterFilesWithWhitelist({ L".dll" });
 
+	for (auto file : directory.files()) {
+		loadDll(file->fullPath(), file->name());
+	}
 }

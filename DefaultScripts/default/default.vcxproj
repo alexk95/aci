@@ -11,14 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\merge.h" />
+    <ClInclude Include="include\rm.h" />
     <ClInclude Include="include\AdditionalOperators.h" />
-    <ClInclude Include="include\merge_global.h" />
+    <ClInclude Include="include\default_global.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\aciAPIFunctions.cpp" />
     <ClCompile Include="src\AdditionalOperators.cpp" />
-    <ClCompile Include="src\merge.cpp" />
+    <ClCompile Include="src\rm.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C18D91F6-B62D-49B9-AECD-B0148AB88DA3}</ProjectGuid>
@@ -95,7 +95,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>MERGE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEFAULT_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -109,7 +109,7 @@
       <DebugInformationFormat>None</DebugInformationFormat>
       <Optimization>MaxSpeed</Optimization>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>MERGE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEFAULT_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

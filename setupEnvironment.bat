@@ -26,16 +26,11 @@ IF "%UI_CORE_ROOT%" == "" (
 	goto END
 )
 
-REM Set Qt Environment
-IF "%SIM_PLAT_ROOT%" == "" (
-    IF "%QDIR%" == "" (
-        ECHO Please specify the following environment variable: QDIR
-        goto END
-    )
+IF "%QTDIR_ROOT%" == "" (
+	ECHO Please specify the following environment variables: QTDIR_ROOT
+	goto END
 )
-ELSE (
-    SET QDIR=%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64
-)
+
 SET QTDIR=%QDIR%
 
 REM Set project paths
@@ -43,6 +38,7 @@ SET ACI_UI=%ACI_ROOT%\Interpreter
 SET ACI_CORE=%ACI_ROOT%\Core
 SET ACI_EXAMPLE=%ACI_ROOT%\ScriptExample
 SET ACI_DEFAULT_MERGE=%ACI_ROOT%\DefaultScripts\merge
+SET ACI_DEFAULT_DEFAULT=%ACI_ROOT%\DefaultScripts\default
 
 REM Setup UI Core env
 CALL "%UI_CORE_ROOT%\setupEnvironment.bat"

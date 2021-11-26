@@ -19,5 +19,7 @@ x64
 /**/.vs
 /**/bin
 /**/obj
-/**/ScriptData
 /**/Deployment
+/**/Backups
+/**/Scripts
+/**/ScriptData

@@ -45,6 +45,8 @@ void InterpreterCore::addScriptObject(aci::InterpreterObject * _obj) {
 	}
 	m_objects.insert_or_assign(_obj->key(), _obj);
 	_obj->attachCore(this);
+	_obj->attachNotifier(m_notifier);
+	_obj->attachPrinter(m_printer);
 }
 
 void InterpreterCore::setCurrentPath(const std::wstring& _path) {

@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma warning(disable: 4251)
+
 #include <aci/aciSharedDataTypes.h>
 
 #include <string>
@@ -10,7 +12,7 @@ namespace aci {
 	class ExternalDllScript;
 	class InterpreterCore;
 	
-	class ScriptLoader {
+	class ACI_API_EXPORT ScriptLoader {
 	public:
 		ScriptLoader(InterpreterCore * _core);
 		virtual ~ScriptLoader();

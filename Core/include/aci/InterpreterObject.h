@@ -75,9 +75,11 @@ namespace aci {
 
 		// Getter
 
-		std::list<std::wstring> filesInDirectory(const std::wstring& _subdirectory);
+		std::list<std::wstring> filesInDirectory(const std::wstring& _directoryPath);
+		std::list<std::wstring> filesInDataDirectory(const std::wstring& _subdirectory = std::wstring());
 
-		std::list<std::wstring> subdirectories(const std::wstring& _subdirectory);
+		std::list<std::wstring> subdirectories(const std::wstring& _directoryPath);
+		std::list<std::wstring> subdirectoriesInDataDirectory(const std::wstring& _subdirectory = std::wstring());
 
 		// ################################################################################################################################
 

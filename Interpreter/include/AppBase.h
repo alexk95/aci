@@ -51,6 +51,12 @@ public:
 	//! @brief This function will be called when the window is about to close
 	//! If return false then the window will not be closed
 	virtual bool closeEvent(void) override;
+
+	virtual void disableInput(void) override;
+	virtual void disableInputAsync(void) override;
+	virtual void enableInput(void) override;
+	virtual void enableInputAsync(void) override;
+
 	virtual void shutdown(void) override;
 
 	virtual void print(const std::string& _str) override;
@@ -67,14 +73,16 @@ public:
 
 	virtual bool fileExists(const std::wstring& _path) override;
 	virtual bool deleteFile(const std::wstring& _path) override;
+	virtual bool readFile(std::wstring& _data, const std::wstring& _path) override;
 	virtual bool readLinesFromFile(std::list<std::wstring>& _data, const std::wstring& _path) override;
+	virtual bool writeFile(const std::wstring& _data, const std::wstring& _path) override;
 	virtual bool writeLinesToFile(const std::list<std::wstring>& _data, const std::wstring& _path) override;
 
 	virtual bool directoryExists(const std::wstring& _path) override;
 	virtual std::list<std::wstring> filesInDirectory(const std::wstring& _path, bool _searchTopLevelDirectoryOnly) override;
 	virtual std::list<std::wstring> subdirectories(const std::wstring& _path, bool _searchTopLevelDirectoryOnly) override;
 	virtual std::wstring currentDirectory(void) override;
-	virtual std::wstring scriptDirectory(void) override;
+	virtual std::wstring scriptDataDirectory(void) override;
 
 	virtual std::wstring getSettingsValue(const std::string& _key, const std::wstring& _defaultValue = std::wstring()) override;
 	virtual void setSettingsValue(const std::string& _key, const std::wstring& _value) override;
@@ -88,6 +96,7 @@ public:
 private slots:
 	void slotHandle(void);
 
+	void slotSetInputEnabled(bool _enabled);
 	void slotPrintMessage(const QString& _message);
 	void slotSetColor(const QColor& _color);
 
