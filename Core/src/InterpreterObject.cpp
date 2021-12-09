@@ -84,7 +84,6 @@ void aci::InterpreterObject::print(const wchar_t * _message) { print(std::wstrin
 void aci::InterpreterObject::queuePrint(const char * _message) { queuePrint(std::string(_message)); }
 void aci::InterpreterObject::queuePrint(const wchar_t * _message) { queuePrint(std::wstring(_message)); }
 
-
 void aci::InterpreterObject::print(bool _value) {
 	if (_value) {
 		setColor(0, 255, 0);

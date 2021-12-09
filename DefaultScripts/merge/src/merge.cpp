@@ -1116,7 +1116,7 @@ bool merge::checkFileContent(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, cons
 						return true;
 					}
 
-					queueColor(255, 0, 0);
+					queueColor(255, 150, 50);
 					queuePrint(_logPrefix + L"                         Updated: " + _d2.fullPath() + L"/" + f1 + L"\n");
 				}
 			}
@@ -1140,7 +1140,7 @@ bool merge::checkFileContent(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, cons
 						return true;
 					}
 
-					queueColor(255, 0, 0);
+					queueColor(255, 150, 50);
 					queuePrint(_logPrefix + L"Updated: " + _d1.fullPath() + L"/" + f1 + L"\n");
 				}
 			}

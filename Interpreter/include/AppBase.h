@@ -74,6 +74,7 @@ public:
 	virtual bool fileExists(const std::wstring& _path) override;
 	virtual bool deleteFile(const std::wstring& _path) override;
 	virtual bool readFile(std::wstring& _data, const std::wstring& _path) override;
+	virtual bool editFile(std::list<std::wstring>& _data, std::wstring& _path) override;
 	virtual bool readLinesFromFile(std::list<std::wstring>& _data, const std::wstring& _path) override;
 	virtual bool writeFile(const std::wstring& _data, const std::wstring& _path) override;
 	virtual bool writeLinesToFile(const std::list<std::wstring>& _data, const std::wstring& _path) override;
@@ -86,7 +87,12 @@ public:
 
 	virtual std::wstring getSettingsValue(const std::string& _key, const std::wstring& _defaultValue = std::wstring()) override;
 	virtual void setSettingsValue(const std::string& _key, const std::wstring& _value) override;
-
+	
+	//! @brief Will request the next command from the Interpreter
+	//! The request will be queued. When the user has finished the input the command will be send to the proivided object
+	//! @param _obj The object the input will be send to
+	virtual void requestNextCommand(aci::InterpreterObject * _obj) override;
+	
 	// ##################################################################################################
 
 	void loadScripts(void);

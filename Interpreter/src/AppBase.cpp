@@ -208,6 +208,10 @@ bool AppBase::readFile(std::wstring& _data, const std::wstring& _path) {
 	return true;
 }
 
+bool AppBase::editFile(std::list<std::wstring>& _data, std::wstring& _path) {
+	return false;
+}
+
 bool AppBase::readLinesFromFile(std::list<std::wstring>& _data, const std::wstring& _path) {
 	QFile file(QString::fromStdWString(_path));
 	if (!file.exists()) { assert(0); return false; }
