@@ -6,8 +6,23 @@ namespace aci {
 	
 	class ACI_API_EXPORT Color {
 	public:
+
+		enum DefaultColor {
+			BLACK,
+			WHITE,
+			RED,
+			GREEN,
+			BLUE,
+			YELLOW,
+			ORANGE,
+			AQUA,
+			LIME,
+			PURPLE
+		};
+
 		Color();
 		Color(int _r, int _g, int _b, int _a = 255);
+		Color(DefaultColor _color);
 		Color(const Color& _other);
 		virtual ~Color();
 		Color& operator = (const Color& _other);
@@ -17,6 +32,7 @@ namespace aci {
 		// Setter
 
 		void set(int _r, int _g, int _b, int _a = 255);
+		void set(DefaultColor _color);
 		void setR(int _r) { m_r = _r; }
 		void setG(int _g) { m_r = _g; }
 		void setB(int _b) { m_r = _b; }

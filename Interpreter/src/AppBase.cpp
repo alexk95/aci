@@ -309,6 +309,10 @@ void AppBase::setSettingsValue(const std::string& _key, const std::wstring& _val
 	uiAPI::settings::setString(QString::fromStdString(_key), QString::fromStdWString(_value));
 }
 
+void AppBase::requestNextCommand(aci::InterpreterObject * _obj) {
+
+}
+
 // #########################################################################################
 
 void AppBase::loadScripts(void) {
@@ -401,10 +405,15 @@ void AppBase::slotKeyDownOnInpout(QKeyEvent * _event) {
 		}
 		else { m_in->setText(m_commandBuffer[m_commandIndex - 1]); }
 	}
+	else if (_event->key() == Qt::Key_Alt) {
+		m_out->setEnabled(true);
+	}
 }
 
 void AppBase::slotKeyUpOnInput(QKeyEvent * _event) {
-
+	if (_event->key() == Qt::Key_Alt) {
+		m_out->setEnabled(false);
+	}
 }
 
 void AppBase::slotTabPressOnInput(void) {

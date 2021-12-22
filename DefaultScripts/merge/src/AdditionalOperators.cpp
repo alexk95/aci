@@ -1,5 +1,7 @@
 #include <AdditionalOperators.h>
 
+/*
+
 bool aci::operator > (const QDateTime& _left, const QDateTime& _right) {
 	if (_left.date() > _right.date()) { return true; }
 	else if (_left.date() == _right.date()) {
@@ -31,3 +33,5 @@ bool aci::operator <= (const QDateTime& _left, const QDateTime& _right) {
 	}
 	return false;
 }
+
+*/

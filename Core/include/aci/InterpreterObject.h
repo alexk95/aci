@@ -27,7 +27,8 @@ namespace aci {
 
 		void showInfo(void);
 
-		void showDelimiterLine(void);
+		void printDelimiterLine(void);
+		void queueDelimiterLine(void);
 
 		// ################################################################################################################################
 
@@ -70,6 +71,9 @@ namespace aci {
 
 		void setColor(const Color& _color);
 		void queueColor(const Color& _color);
+
+		void setColor(Color::DefaultColor _color);
+		void queueColor(Color::DefaultColor _color);
 
 		// ################################################################################################################################
 

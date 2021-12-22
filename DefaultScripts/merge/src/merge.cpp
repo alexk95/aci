@@ -1,5 +1,6 @@
 #include "merge.h"
 #include <aci/aFile.h>
+#include <aci/Color.h>
 #include <AdditionalOperators.h>
 
 #include <qjsondocument.h>
@@ -10,6 +11,8 @@
 #include <qtextstream.h>
 
 #include <thread>
+
+using namespace aci;
 
 merge::merge(void)
 	: m_searchTopDirectoryOnly(false), m_blackListDActive(false), m_whiteListDActive(false),
@@ -25,9 +28,9 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 		if (_params.back() == L"cfg") { cmdConfiguration(); return true; }
 		else if (_params.back() == L"clear") { cmdClear(); return true; }
 		else if (_params.back() == L"run" || _params.back() == L"merge") { return run(false); }
-		else if (_params.back() == L"dif") { return run(true); }
+		else if (_params.back() == L"diff") { return run(true); }
 		else {
-			setColor(255, 0, 0);
+			setColor(Color::RED);
 			print(m_prefix + L"Invalid arguments for \"merge\". Try \"?merge\" for help\n");
 			return false;
 		}
@@ -45,19 +48,19 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 				return true;
 			}
 			else {
-				setColor(255, 0, 0);
+				setColor(Color::RED);
 				print(m_prefix + L"Invalid value for \"Directory whitelist active = <value>\"\n");
 				return false;
 			}
 		}
-		else if (*std::next(_params.begin()) == L"+wd") {
+		else if (*std::next(_params.begin()) == L"+wd" || *std::next(_params.begin()) == L"wd+") {
 			for (auto itm : m_whiteListD) {
 				if (itm == _params.back()) { return true; }
 			}
 			m_whiteListD.push_back(_params.back());
 			return true;
 		}
-		else if (*std::next(_params.begin()) == L"-wd") {
+		else if (*std::next(_params.begin()) == L"-wd" || *std::next(_params.begin()) == L"wd-") {
 			if (_params.back() == L"*") { m_whiteListD.clear(); return true; }
 			for (auto it = m_whiteListD.begin(); it != m_whiteListD.end(); it++) {
 				if (*it == _params.back()) {
@@ -65,11 +68,11 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 					return true;
 				}
 			}
-			setColor(255, 0, 0);
+			setColor(Color::RED);
 			print(m_prefix + L"Directory whitelist entry \"");
-			setColor(255, 150, 50);
+			setColor(Color::ORANGE);
 			print(_params.back());
-			setColor(255, 0, 0);
+			setColor(Color::RED);
 			print("\" not found\n");
 			return false;
 		}
@@ -85,19 +88,19 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 				return true;
 			}
 			else {
-				setColor(255, 0, 0);
+				setColor(Color::RED);
 				print(m_prefix + L"Invalid value for \"Directory blacklist active = <value>\"\n");
 				return false;
 			}
 		}
-		else if (*std::next(_params.begin()) == L"+bd") {
+		else if (*std::next(_params.begin()) == L"+bd" || *std::next(_params.begin()) == L"bd+") {
 			for (auto itm : m_blackListD) {
 				if (itm == _params.back()) { return true; }
 			}
 			m_blackListD.push_back(_params.back());
 			return true;
 		}
-		else if (*std::next(_params.begin()) == L"-bd") {
+		else if (*std::next(_params.begin()) == L"-bd" || *std::next(_params.begin()) == L"bd-") {
 			if (_params.back() == L"*") { m_blackListD.clear(); return true; }
 			for (auto it = m_blackListD.begin(); it != m_blackListD.end(); it++) {
 				if (*it == _params.back()) {
@@ -105,11 +108,11 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 					return true;
 				}
 			}
-			setColor(255, 0, 0);
+			setColor(Color::RED);
 			print(m_prefix + L"Directory blacklist entry \"");
-			setColor(255, 150, 50);
+			setColor(Color::ORANGE);
 			print(_params.back());
-			setColor(255, 0, 0);
+			setColor(Color::RED);
 			print("\" not found\n");
 			return false;
 		}
@@ -125,19 +128,19 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 				return true;
 			}
 			else {
-				setColor(255, 0, 0);
+				setColor(Color::RED);
 				print(m_prefix + L"Invalid value for \"File whitelist active = <value>\"\n");
 				return false;
 			}
 		}
-		else if (*std::next(_params.begin()) == L"+wf") {
+		else if (*std::next(_params.begin()) == L"+wf" || *std::next(_params.begin()) == L"wf+") {
 			for (auto itm : m_whiteListF) {
 				if (itm == _params.back()) { return true; }
 			}
 			m_whiteListF.push_back(_params.back());
 			return true;
 		}
-		else if (*std::next(_params.begin()) == L"-wf") {
+		else if (*std::next(_params.begin()) == L"-wf" || *std::next(_params.begin()) == L"wf-") {
 			if (_params.back() == L"*") { m_whiteListF.clear(); return true; }
 			for (auto it = m_whiteListF.begin(); it != m_whiteListF.end(); it++) {
 				if (*it == _params.back()) {
@@ -145,11 +148,11 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 					return true;
 				}
 			}
-			setColor(255, 0, 0);
+			setColor(Color::RED);
 			print(m_prefix + L"File whitelist entry \"");
-			setColor(255, 150, 50);
+			setColor(Color::ORANGE);
 			print(_params.back());
-			setColor(255, 0, 0);
+			setColor(Color::RED);
 			print("\" not found\n");
 			return false;
 		}
@@ -165,19 +168,19 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 				return true;
 			}
 			else {
-				setColor(255, 0, 0);
+				setColor(Color::RED);
 				print(m_prefix + L"Invalid value for \"File blacklist active = <value>\"\n");
 				return false;
 			}
 		}
-		else if (*std::next(_params.begin()) == L"+bf") {
+		else if (*std::next(_params.begin()) == L"+bf" || *std::next(_params.begin()) == L"bf+") {
 			for (auto itm : m_blackListF) {
 				if (itm == _params.back()) { return true; }
 			}
 			m_blackListF.push_back(_params.back());
 			return true;
 		}
-		else if (*std::next(_params.begin()) == L"-bf") {
+		else if (*std::next(_params.begin()) == L"-bf" || *std::next(_params.begin()) == L"bf+") {
 			if (_params.back() == L"*") { m_blackListF.clear(); return true; }
 			for (auto it = m_blackListF.begin(); it != m_blackListF.end(); it++) {
 				if (*it == _params.back()) {
@@ -185,11 +188,11 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 					return true;
 				}
 			}
-			setColor(255, 0, 0);
+			setColor(Color::RED);
 			print(m_prefix + L"File blacklist entry \"");
-			setColor(255, 150, 50);
+			setColor(Color::ORANGE);
 			print(_params.back());
-			setColor(255, 0, 0);
+			setColor(Color::RED);
 			print("\" not found\n");
 			return false;
 		}
@@ -213,7 +216,7 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 			if (opt == "true" || opt == "1") { m_searchTopDirectoryOnly = true; return true; }
 			else if (opt == "false" || opt == "0") { m_searchTopDirectoryOnly = false; return true; }
 			else {
-				setColor(255, 0, 0);
+				setColor(Color::RED);
 				print(m_prefix + L"Invalid value for \"Top level only active = <value>\"\n");
 				return false;
 			}
@@ -224,14 +227,14 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 			if (opt == "true" || opt == "1") { m_autoMerge = true; return true; }
 			else if (opt == "false" || opt == "0") { m_autoMerge = false; return true; }
 			else {
-				setColor(255, 0, 0);
+				setColor(Color::RED);
 				print(m_prefix + L"Invalid value for \"Auto merge active = <value>\"\n");
 				return false;
 			}
 		}
 	}
 
-	setColor(255, 0, 0);
+	setColor(Color::RED);
 	print(m_prefix + L"Invalid arguments for \"" + key() + L"\"\n");
 	return false;
 }
@@ -239,70 +242,89 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 // #####################################################################################################
 
 void merge::cmdConfiguration(void) {
-	showDelimiterLine();
-	print(L"###  " + key() + L" configuration  ###\n");
-
+	printDelimiterLine();
+	setColor(Color::WHITE);
+	print(L"###  ");
+	setColor(Color::PURPLE);
+	print(key() + L" configuration");
+	setColor(Color::WHITE);
+	print(L"  ###\n");
+	
+	printDelimiterLine();
+	print(L"\n");
 	print(L"Directory 1:                     ");
+	setColor(Color::ORANGE);
 	if (m_pathOne.empty()) { print(L"<empty>\n"); }
 	else { print(m_pathOne + L"\n"); }
+	setColor(Color::WHITE);
 
 	print("Directory 2:                     ");
+	setColor(Color::ORANGE);
 	if (m_pathTwo.empty()) { print("<empty>\n"); }
 	else { print(m_pathTwo + L"\n"); }
+	setColor(Color::WHITE);
 
 	print("Search only top level directory: ");
 	print(m_searchTopDirectoryOnly);
-	setColor(255, 255, 255);
+	setColor(Color::WHITE);
 	print("\n");
 
 	print("Auto merge:                      ");
 	print(m_autoMerge);
-	setColor(255, 255, 255);
+	setColor(Color::WHITE);
 	print("\n");
 
 	print("Whilelist (directories) active:  ");
 	print(m_whiteListDActive);
-	setColor(255, 255, 255);
+	setColor(Color::WHITE);
 	print("\n");
 
 	print("Whitelist (directories):\n");
+	setColor(Color::ORANGE);
 	if (m_whiteListD.empty()) { print("\t<empty>\n"); }
 	else {
 		for (auto itm : m_whiteListD) { print(L"\t" + itm + L"\n"); }
 	}
+	setColor(Color::WHITE);
 
 	print("Blacklist (directories) active:  ");
 	print(m_blackListDActive);
-	setColor(255, 255, 255);
+	setColor(Color::WHITE);
 	print("\n");
 
 	print("Blacklist (directories):\n");
+	setColor(Color::ORANGE);
 	if (m_blackListD.empty()) { print("\t<empty>\n"); }
 	else {
 		for (auto itm : m_blackListD) { print(L"\t" + itm + L"\n"); }
 	}
+	setColor(Color::WHITE);
 
 	print("Whilelist (files) active:        ");
 	print(m_whiteListFActive);
-	setColor(255, 255, 255);
+	setColor(Color::WHITE);
 	print("\n");
 
 	print("Whitelist (files):\n");
+	setColor(Color::ORANGE);
 	if (m_whiteListF.empty()) { print("\t<empty>\n"); }
 	else {
 		for (auto itm : m_whiteListF) { print(L"\t" + itm + L"\n"); }
 	}
+	setColor(Color::WHITE);
 
 	print("Blacklist (files) active:        ");
 	print(m_blackListFActive);
-	setColor(255, 255, 255);
+	setColor(Color::WHITE);
 	print("\n");
 
 	print("Blacklist (files):\n");
+	setColor(Color::ORANGE);
 	if (m_blackListF.empty()) { print("\t<empty>\n"); }
 	else {
 		for (auto itm : m_blackListF) { print(L"\t" + itm + L"\n"); }
 	}
+	setColor(Color::WHITE);
 }
 
 void merge::cmdClear(void) {
@@ -341,7 +363,7 @@ bool merge::cmdLoad(const QString& _filename) {
 	QJsonDocument doc = QJsonDocument::fromJson(byteData);
 	if (!doc.isObject()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Invalid document format\n");
 		return false;
 	}
@@ -350,73 +372,73 @@ bool merge::cmdLoad(const QString& _filename) {
 	QJsonObject obj = doc.object();
 	if (!obj.contains("DirectoryOne")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryOne\" is missing\n");
 		return false;
 	}
 	if (!obj.contains("DirectoryTwo")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryTwo\" is missing\n");
 		return false;
 	}
 	if (!obj.contains("SearchTopOnly")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"SearchTopOnly\" is missing\n");
 		return false;
 	}
 	if (!obj.contains("AutoMerge")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"AutoMerge\" is missing\n");
 		return false;
 	}
 	if (!obj.contains("DirectoryWhitelistActive")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryWhitelistActive\" is missing\n");
 		return false;
 	}
 	if (!obj.contains("DirectoryWhitelist")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryWhitelist\" is missing\n");
 		return false;
 	}
 	if (!obj.contains("DirectoryBlacklistActive")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryBlacklistActive\" is missing\n");
 		return false;
 	}
 	if (!obj.contains("DirectoryBlacklist")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryBlacklist\" is missing\n");
 		return false;
 	}
 	if (!obj.contains("FileWhitelistActive")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"FileWhitelistActive\" is missing\n");
 		return false;
 	}
 	if (!obj.contains("FileWhitelist")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"FileWhitelist\" is missing\n");
 		return false;
 	}
 	if (!obj.contains("FileBlacklistActive")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"FileBlacklistActive\" is missing\n");
 		return false;
 	}
 	if (!obj.contains("FileBlacklist")) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"FileBlacklist\" is missing\n");
 		return false;
 	}
@@ -424,73 +446,73 @@ bool merge::cmdLoad(const QString& _filename) {
 	// Check data types
 	if (!obj["DirectoryOne"].isString()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryOne\" is not a string\n");
 		return false;
 	}
 	if (!obj["DirectoryTwo"].isString()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryTwo\" is not a string\n");
 		return false;
 	}
 	if (!obj["SearchTopOnly"].isBool()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"SearchTopOnly\" is not a boolean\n");
 		return false;
 	}
 	if (!obj["AutoMerge"].isBool()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"AutoMerge\" is not a boolean\n");
 		return false;
 	}
 	if (!obj["DirectoryWhitelistActive"].isBool()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryWhitelistActive\" is not a boolean\n");
 		return false;
 	}
 	if (!obj["DirectoryWhitelist"].isArray()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryWhitelist\" is not a array\n");
 		return false;
 	}
 	if (!obj["DirectoryBlacklistActive"].isBool()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryBlacklistActive\" is not a boolean\n");
 		return false;
 	}
 	if (!obj["DirectoryBlacklist"].isArray()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"DirectoryBlacklist\" is not a array\n");
 		return false;
 	}
 	if (!obj["FileWhitelistActive"].isBool()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"FileWhitelistActive\" is not a boolean\n");
 		return false;
 	}
 	if (!obj["FileWhitelist"].isArray()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"FileWhitelist\" is not a array\n");
 		return false;
 	}
 	if (!obj["FileBlacklistActive"].isBool()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"FileBlacklistActive\" is not a boolean\n");
 		return false;
 	}
 	if (!obj["FileBlacklist"].isArray()) {
 		print("[merge] [parse]: ");
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print("Member \"FileBlacklist\" is not a array\n");
 		return false;
 	}
@@ -614,15 +636,15 @@ void merge::showSavedConfigs(void) {
 
 // Merger
 
-bool merge::run(bool _difOnly) {
+bool merge::run(bool _diffOnly) {
 
 	if (m_pathOne.empty()) {
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print(m_prefix + L"Diretory one is empty\n");
 		return false;
 	}
 	if (m_pathTwo.empty()) {
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print(m_prefix + L"Diretory one is empty\n");
 		return false;
 	}
@@ -632,20 +654,20 @@ bool merge::run(bool _difOnly) {
 	aci::aDir d2(L"", m_pathTwo);
 
 	if (!d1.exists()) {
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print(m_prefix + L"The directory \"" + m_pathOne + L"\" does not exist\n");
 		return false;
 	}
 
 	if (!d2.exists()) {
-		setColor(255, 0, 0);
+		setColor(Color::RED);
 		print(m_prefix + L"The directory \"" + m_pathTwo + L"\" does not exist\n");
 		return false;
 	}
 
 	disableInput();
 
-	std::thread t1(&merge::performRun, this, _difOnly, d1, d2);
+	std::thread t1(&merge::performRun, this, _diffOnly, d1, d2);
 	t1.detach();
 	return true;
 }
@@ -654,9 +676,9 @@ bool merge::run(bool _difOnly) {
 
 // Slots
 
-void merge::finishRun(bool _difOnly) {
-	queueColor(255, 255, 255);
-	if (_difOnly) { queuePrint(m_prefix + L"[dif]: Done\n"); }
+void merge::finishRun(bool _diffOnly) {
+	queueColor(Color::WHITE);
+	if (_diffOnly) { queuePrint(m_prefix + L"[diff]: Done\n"); }
 	else { queuePrint(m_prefix + L"[merge]: Done\n"); }
 	queueEnableInput();
 }
@@ -666,132 +688,115 @@ void merge::finishRun(bool _difOnly) {
 // Protected functions
 
 void merge::showCommandInfo(void) {
+	setColor(Color::WHITE);
 	print(m_prefix + L"? Merge is used to update a project that is located in two different locations\n");
 	print(m_prefix + L"? Merge will compare missing folders and files, and replace outdated files\n");
 	print(m_prefix + L"? with the newest version from the other directory\n\n");
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\tcfg               ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Show the current configuration\n");
+	print(m_prefix + L"\t");
+	print(L"cfg               Show the current configuration\n");
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\ttop <active>      ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will activate/disable the top level only option ( true / false / 0 / 1 )\n");
+	setColor(Color::WHITE);
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"top <active>      Will activate/disable the top level only option ( true / false / 0 / 1 )\n");
+	setColor(Color::WHITE);
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\tauto <active>     ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will activate/disable the auto merge option ( true / false / 0 / 1 )\n");
+	print(m_prefix + L"\t");
+	print(L"auto <active>     Will activate/disable the auto merge option ( true / false / 0 / 1 )\n");
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\tload ?            ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Show all saved configurations\n");
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"load              Show all saved configurations\n");
+	setColor(Color::WHITE);
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\tsave ?            ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Show all saved configurations\n");
+	print(m_prefix + L"\t");
+	print(L"save              Show all saved configurations\n");
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\trun ?             ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will start the merge with the current configuration\n");
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"run               Will start the merge with the current configuration\n");
+	setColor(Color::WHITE);
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\tmerge ?           ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will start the merge with the current configuration\n");
+	print(m_prefix + L"\t");
+	print(L"merge ?           Will start the merge with the current configuration\n");
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\tdif ?             ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will start the dif with the current configuration\n");
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"diff ?            Will start the diff with the current configuration\n");
+	setColor(Color::WHITE);
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\td1 <path>         ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"The the directory 1\n");
+	print(m_prefix + L"\t");
+	print(L"d1 <path>         Set directory 1\n");
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\td2 <path>         ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"The the directory 2\n");
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"d2 <path>         Set directory 2\n");
+	setColor(Color::WHITE);
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\tload <filename>   ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will load the configuration from the file specified\n"
+	print(m_prefix + L"\t");
+	print(L"load <filename>   Will load the configuration from the file specified\n"
 		"\t                       (");
-	setColor(255, 150, 50);
-	print(m_prefix + L"\"../ScriptData/merge/Configurations");
+	setColor(Color::ORANGE);
+	print(L"\"../ScriptData/merge/Configurations");
 	setColor(0, 255, 0);
-	print(m_prefix + L"<filename>");
-	setColor(255, 150, 50);
-	print(m_prefix + L".json\")\n");
+	print(L"<filename>");
+	setColor(Color::ORANGE);
+	print(L".json\")\n");
+	setColor(Color::WHITE);
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\tsave <filename>   ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will save the configuration to the file specified\n"
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"save <filename>   Will save the configuration to the file specified\n"
 		"\t                       (");
-	setColor(255, 150, 50);
-	print(m_prefix + L"\"../ScriptData/merge/Configurations");
+	setColor(Color::ORANGE);
+	print(L"\"../ScriptData/merge/Configurations");
 	setColor(0, 255, 0);
-	print(m_prefix + L"<filename>");
-	setColor(255, 150, 50);
-	print(m_prefix + L".json\")\n");
+	print(L"<filename>");
+	setColor(Color::ORANGE);
+	print(L".json\")\n");
+	setColor(Color::WHITE);
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\twd <active>       ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will activate/disable the whitelist for directories ( true / false / 0 / 1 )\n");
+	print(m_prefix + L"\t");
+	print(L"wd <active>       Will activate/disable the whitelist for directories ( true / false / 0 / 1 )\n");
+	
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"+wd <filter>      Will add the provided filter to the directories whitelist\n");
+	setColor(Color::WHITE);
+	
+	print(m_prefix + L"\t");
+	print(L"-wd <filter>      Will remove the provided filter from the directories whitelist\n");
+	
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"-wd *             Will clear the directories whitelist\n");
+	setColor(Color::WHITE);
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\t+wd <filter>      ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will add the provided filter to the directories whitelist\n");
+	print(m_prefix + L"\t");
+	print(L"bd <active>       Will activate/disable the blacklist for directories ( true / false / 0 / 1 )\n");
+	
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"+bd <filter>      Will add the provided filter to the directories blacklist\n");
+	setColor(Color::WHITE);
+	
+	print(m_prefix + L"\t");
+	print(L"-bd <filter>      Will remove the provided filter from directories the blacklist\n");
 
-	setColor(255, 150, 50);
-	print(m_prefix + L"\t-wd <filter>      ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will remove the provided filter from the directories whitelist\n");
-
-	setColor(255, 150, 50);
-	print(m_prefix + L"\t-wd *             ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will clear the directories whitelist\n");
-
-	setColor(255, 150, 50);
-	print(m_prefix + L"\tbd <active>       ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will activate/disable the blacklist for directories ( true / false / 0 / 1 )\n");
-
-	setColor(255, 150, 50);
-	print(m_prefix + L"\t+bd <filter>      ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will add the provided filter to the directories blacklist\n");
-
-	setColor(255, 150, 50);
-	print(m_prefix + L"\t-bd <filter>      ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will remove the provided filter from directories the blacklist\n");
-
-	setColor(255, 150, 50);
-	print(m_prefix + L"\t-bd *             ");
-	setColor(255, 255, 255);
-	print(m_prefix + L"Will clear the directories blacklist\n");
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"-bd *             Will clear the directories blacklist\n");
+	setColor(Color::WHITE);
 }
 
 // #####################################################################################################
 
 // Private functions
 
-void merge::performRun(bool _difOnly, aci::aDir _d1, aci::aDir _d2) {
+void merge::performRun(bool _diffOnly, aci::aDir _d1, aci::aDir _d2) {
 	std::wstring prefix;
-	if (_difOnly) { prefix = m_prefix + L"[dif]: "; }
+	if (_diffOnly) { prefix = m_prefix + L"[diff]: "; }
 	else { prefix = m_prefix + L"[merge]: "; }
 
 	try {
@@ -849,64 +854,64 @@ void merge::performRun(bool _difOnly, aci::aDir _d1, aci::aDir _d2) {
 		// Check dirs
 
 		queuePrint(prefix + L"Check directories\n");
-		if (checkDirectories(_difOnly, _d1, _d2, prefix) && (_difOnly || !m_autoMerge)) {
-			queueColor(255, 150, 50);
+		if (checkDirectories(_diffOnly, _d1, _d2, prefix) && (_diffOnly || !m_autoMerge)) {
+			queueColor(Color::ORANGE);
 			queuePrint(prefix + L"! > Execution stopped. Continue manually\n");
-			finishRun(_difOnly);
+			finishRun(_diffOnly);
 			return;
 		}
-		queueColor(255, 255, 255);
+		queueColor(Color::WHITE);
 		queuePrint(prefix + L"Check directories ");
 		queueColor(0, 255, 0);
-		queuePrint("NO DIF\n");
-		queueColor(255, 255, 255);
+		queuePrint("NO DIFF\n");
+		queueColor(Color::WHITE);
 
 		// #########################################################################################################################
 
 		// Check files existance
 
 		queuePrint(prefix + L"Check files (existance)\n");
-		if (checkFiles(_difOnly, _d1, _d2, prefix) && (_difOnly || !m_autoMerge)) {
-			queueColor(255, 150, 50);
+		if (checkFiles(_diffOnly, _d1, _d2, prefix) && (_diffOnly || !m_autoMerge)) {
+			queueColor(Color::ORANGE);
 			queuePrint(prefix + L"! > Execution stopped. Continue manually\n");
-			finishRun(_difOnly);
+			finishRun(_diffOnly);
 			return;
 		}
-		queueColor(255, 255, 255);
+		queueColor(Color::WHITE);
 		queuePrint(prefix + L"Check files (existance) ");
 		queueColor(0, 255, 0);
-		queuePrint("NO DIF\n");
-		queueColor(255, 255, 255);
+		queuePrint("NO DIFF\n");
+		queueColor(Color::WHITE);
 
 		// #########################################################################################################################
 
 		// Check file content
 
 		queuePrint(prefix + L"Check files (content)\n");
-		if (checkFileContent(_difOnly, _d1, _d2, prefix)) {
-			queueColor(255, 255, 255);
+		if (checkFileContent(_diffOnly, _d1, _d2, prefix)) {
+			queueColor(Color::WHITE);
 			queuePrint(prefix + L"Check files (content) ");
 			queueColor(0, 255, 0);
 			queuePrint("DONE\n");
-			queueColor(255, 255, 255);
+			queueColor(Color::WHITE);
 		}
 		else {
-			queueColor(255, 255, 255);
+			queueColor(Color::WHITE);
 			queuePrint(prefix + L"Check files (content) ");
 			queueColor(0, 255, 0);
-			queuePrint("NO DIF\n");
-			queueColor(255, 255, 255);
+			queuePrint("NO DIFF\n");
+			queueColor(Color::WHITE);
 		}
 	}
 	catch (const std::exception& _e) {
 		queuePrint(prefix + L"Check directories\n");
-		finishRun(_difOnly);
+		finishRun(_diffOnly);
 		
 	}
-	finishRun(_difOnly);
+	finishRun(_diffOnly);
 }
 
-bool merge::checkDirectories(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix) {
+bool merge::checkDirectories(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix) {
 
 	bool ret{ false };
 
@@ -915,9 +920,9 @@ bool merge::checkDirectories(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, cons
 
 	// ##### 1 > 2
 
-	queueColor(255, 150, 50);
+	queueColor(Color::ORANGE);
 	queuePrint(_logPrefix + L"##############################################################\n");
-	queueColor(255, 255, 255);
+	queueColor(Color::WHITE);
 	queuePrint(_logPrefix + L"     From: " + _d1.fullPath() + L"\n" +
 		_logPrefix + L"     To:   " + _d2.fullPath() + L"\n\n");
 
@@ -925,13 +930,17 @@ bool merge::checkDirectories(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, cons
 		bool found{ false };
 		for (auto s2 : sub2) { if (s1 == s2) { found = true; break; } }
 		if (!found) {
-			if (_difOnly) {
-				queueColor(255, 0, 0);
-				queuePrint(_logPrefix + L"Missing: " + s1 + L"\n");
+			if (_diffOnly) {
+				queueColor(Color::WHITE);
+				queuePrint(_logPrefix);
+				queueColor(Color::ORANGE);
+				queuePrint(L"Missing: " + s1 + L"\n");
 			}
 			else {
-				queueColor(255, 150, 50);
-				queuePrint(_logPrefix + L"Creating: " + s1 + L"\n");
+				queueColor(Color::WHITE);
+				queuePrint(_logPrefix);
+				queueColor(Color::ORANGE);
+				queuePrint(L"Creating: " + s1 + L"\n");
 				QDir().mkdir(QString::fromStdWString(_d2.fullPath() + L"/" + s1));
 			}
 			ret = true;
@@ -940,9 +949,9 @@ bool merge::checkDirectories(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, cons
 
 	// ##### 2 > 1
 
-	queueColor(255, 150, 50);
+	queueColor(Color::ORANGE);
 	queuePrint(_logPrefix + L"##############################################################\n");
-	queueColor(255, 255, 255);
+	queueColor(Color::WHITE);
 	queuePrint(_logPrefix + L"     From: " + _d2.fullPath() + L"\n" +
 		_logPrefix + L"     To:   " + _d1.fullPath() + L"\n\n");
 
@@ -950,16 +959,22 @@ bool merge::checkDirectories(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, cons
 		bool found{ false };
 		for (auto s1 : sub1) { if (s1 == s2) { found = true; break; } }
 		if (!found) {
-			if (_difOnly) {
-				queueColor(255, 0, 0);
-				queuePrint(_logPrefix + L"Missing: " + s2 + L"\n");
+			if (_diffOnly) {
+				queueColor(Color::WHITE);
+				queuePrint(_logPrefix);
+				queueColor(Color::ORANGE);
+				queuePrint(L"Missing: " + s2 + L"\n");
 			}
 			else {
-				queueColor(255, 150, 50);
-				queuePrint(_logPrefix + L"Creating: " + s2 + L"\n");
+				queueColor(Color::WHITE);
+				queuePrint(_logPrefix);
+				queueColor(Color::ORANGE);
+				queuePrint(L"Creating: " + s2 + L"\n");
 				if (!QDir().mkdir(QString::fromStdWString(_d1.fullPath() + L"/" + s2))) {
-					queueColor(255, 0, 0);
-					queuePrint(_logPrefix + L"Failed to create directory (Auto merge disabled now)\n");
+					queueColor(Color::WHITE);
+					queuePrint(_logPrefix);
+					queueColor(Color::RED);
+					queuePrint(L"Failed to create directory (Auto merge disabled now)\n");
 					m_autoMerge = false;
 					return true;
 				}
@@ -971,7 +986,7 @@ bool merge::checkDirectories(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, cons
 	return ret;
 }
 
-bool merge::checkFiles(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix) {
+bool merge::checkFiles(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix) {
 
 	bool ret{ false };
 
@@ -980,28 +995,38 @@ bool merge::checkFiles(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, const std:
 
 	// ##### 1 > 2
 
-	queueColor(255, 150, 50);
-	queuePrint(_logPrefix + L"##############################################################\n");
-	queueColor(255, 255, 255);
-	queuePrint(_logPrefix + L"     From: " + _d1.fullPath() + L"\n" +
-		_logPrefix + L"     To:   " + _d2.fullPath() + L"\n\n");
+	queueColor(Color::WHITE);
+	queuePrint(_logPrefix);
+	queueColor(Color::ORANGE);
+	queuePrint(L"##############################################################\n");
+	queueColor(Color::WHITE);
+	queuePrint(_logPrefix);
+	queuePrint(L"     From: " + _d1.fullPath() + L"\n");
+	queuePrint(_logPrefix);
+	queuePrint(L"     To:   " + _d2.fullPath() + L"\n\n");
 
 	for (auto s1 : files1) {
 		bool found{ false };
 		for (auto s2 : files2) { if (s1 == s2) { found = true; break; } }
 		if (!found) {
-			if (_difOnly) {
-				queueColor(255, 0, 0);
-				queuePrint(_logPrefix + L"Missing: " + s1 + L"\n");
+			if (_diffOnly) {
+				queueColor(Color::WHITE);
+				queuePrint(_logPrefix);
+				queueColor(Color::ORANGE);
+				queuePrint(L"Missing: " + s1 + L"\n");
 			}
 			else {
-				queueColor(255, 150, 50);
-				queuePrint(_logPrefix + L"Creating: " + s1 + L"\n");
+				queueColor(Color::WHITE);
+				queuePrint(_logPrefix);
+				queueColor(Color::ORANGE);
+				queuePrint(L"Creating: " + s1 + L"\n");
 
 				QFile file(QString::fromStdWString(_d1.fullPath() + L"/" + s1));
 				if (!file.copy(QString::fromStdWString(_d2.fullPath() + L"/" + s1))) {
-					queueColor(255, 0, 0);
-					queuePrint(_logPrefix + L"Failed to copy file (Auto merge disabled now)\n");
+					queueColor(Color::WHITE);
+					queuePrint(_logPrefix);
+					queueColor(Color::RED);
+					queuePrint(L"Failed to copy file (Auto merge disabled now)\n");
 					m_autoMerge = false;
 					return true;
 				}
@@ -1012,28 +1037,38 @@ bool merge::checkFiles(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, const std:
 
 	// ##### 2 > 1
 
-	queueColor(255, 150, 50);
-	queuePrint(_logPrefix + L"##############################################################\n");
-	queueColor(255, 255, 255);
-	queuePrint(_logPrefix + L"     From: " + _d2.fullPath() + L"\n" +
-		_logPrefix + L"     To:   " + _d1.fullPath() + L"\n\n");
+	queueColor(Color::WHITE);
+	queuePrint(_logPrefix);
+	queueColor(Color::ORANGE);
+	queuePrint(L"##############################################################\n");
+	queueColor(Color::WHITE);
+	queuePrint(_logPrefix);
+	queuePrint(L"     From: " + _d2.fullPath() + L"\n");
+	queuePrint(_logPrefix);
+	queuePrint(L"     To:   " + _d1.fullPath() + L"\n\n");
 
 	for (auto s2 : files2) {
 		bool found{ false };
 		for (auto s1 : files1) { if (s1 == s2) { found = true; break; } }
 		if (!found) {
-			if (_difOnly) {
-				queueColor(255, 0, 0);
-				queuePrint(_logPrefix + L"Missing: " + s2 + L"\n");
+			if (_diffOnly) {
+				queueColor(Color::WHITE);
+				queuePrint(_logPrefix);
+				queueColor(Color::ORANGE);
+				queuePrint(L"Missing: " + s2 + L"\n");
 			}
 			else {
-				queueColor(255, 150, 50);
-				queuePrint(_logPrefix + L"Creating: " + s2 + L"\n");
+				queueColor(Color::WHITE);
+				queuePrint(_logPrefix);
+				queueColor(Color::ORANGE);
+				queuePrint(L"Creating: " + s2 + L"\n");
 
 				QFile file(QString::fromStdWString(_d2.fullPath() + L"/" + s2));
 				if (!file.copy(QString::fromStdWString(_d1.fullPath() + L"/" + s2))) {
-					queueColor(255, 0, 0);
-					queuePrint(_logPrefix + L"Failed to copy file (Auto merge disabled now)\n");
+					queueColor(Color::WHITE);
+					queuePrint(_logPrefix);
+					queueColor(Color::RED);
+					queuePrint(L"Failed to copy file (Auto merge disabled now)\n");
 					m_autoMerge = false;
 					return true;
 				}
@@ -1045,31 +1080,48 @@ bool merge::checkFiles(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, const std:
 	return ret;
 }
 
-bool merge::checkFileContent(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix) {
+bool merge::checkFileContent(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix) {
 	bool ret{ false };
 
 	std::list<std::wstring> files1 = _d1.fileNameList();
 	std::list<std::wstring> files2 = _d2.fileNameList();
 
+	std::wstring p1 = _d1.fullPath();
+	std::wstring p2 = _d2.fullPath();
+	size_t l = p1.length();
+	if (p2.length() > l) {
+		l = p2.length();
+	}
+	std::wstring spacer;
+	for (size_t i = 0; i < (l + 5); i++) { spacer.append(L" "); }
+
 	// ##### 1 > 2
 
-	queueColor(255, 150, 50);
-	queuePrint(_logPrefix + L"##############################################################\n");
-	queueColor(255, 255, 255);
-	queuePrint(_logPrefix + _d1.fullPath() + L"\n");
-	queuePrint(_logPrefix + L"                         " + _d2.fullPath() + L"\n");
+	queueColor(Color::WHITE);
+	queuePrint(_logPrefix);
+	queueColor(Color::ORANGE);
+	queuePrint(L"##############################################################\n");
+	queueColor(Color::WHITE);
+	queuePrint(_logPrefix);
+	queuePrint(_d1.fullPath() + L"\n");
+	queuePrint(_logPrefix);
+	queuePrint(spacer + _d2.fullPath() + L"\n");
 
 	for (auto f1 : files1) {
 		// File 1
 		QFile file1(QString::fromStdWString(_d1.fullPath() + L"/" + f1));
 		if (!file1.exists()) {
-			queueColor(255, 0, 0);
-			queuePrint(_logPrefix + L"File does not exist (" + _d1.fullPath() + L"/" + f1 + L")\n");
+			queueColor(Color::WHITE);
+			queuePrint(_logPrefix);
+			queueColor(Color::RED);
+			queuePrint(L"File does not exist (" + _d1.fullPath() + L"/" + f1 + L")\n");
 			return true;
 		}
 		if (!file1.open(QIODevice::ReadOnly)) {
-			queueColor(255, 0, 0);
-			queuePrint(_logPrefix + L"Failed to open file for reading (" + _d1.fullPath() + L"/" + f1 + L")\n");
+			queueColor(Color::WHITE);
+			queuePrint(_logPrefix);
+			queueColor(Color::RED);
+			queuePrint(L"Failed to open file for reading (" + _d1.fullPath() + L"/" + f1 + L")\n");
 			return true;
 		}
 
@@ -1079,13 +1131,17 @@ bool merge::checkFileContent(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, cons
 		// File 2
 		QFile file2(QString::fromStdWString(_d2.fullPath() + L"/" + f1));
 		if (!file2.exists()) {
-			queueColor(255, 0, 0);
-			queuePrint(_logPrefix + L"File does not exist (" + _d2.fullPath() + L"/" + f1 + L")\n");
+			queueColor(Color::WHITE);
+			queuePrint(_logPrefix);
+			queueColor(Color::RED);
+			queuePrint(L"File does not exist (" + _d2.fullPath() + L"/" + f1 + L")\n");
 			return true;
 		}
 		if (!file2.open(QIODevice::ReadOnly)) {
-			queueColor(255, 0, 0);
-			queuePrint(_logPrefix + L"Failed to open file for reading (" + _d2.fullPath() + L"/" + f1 + L")\n");
+			queueColor(Color::WHITE);
+			queuePrint(_logPrefix);
+			queueColor(Color::RED);
+			queuePrint(L"Failed to open file for reading (" + _d2.fullPath() + L"/" + f1 + L")\n");
 			return true;
 		}
 
@@ -1097,62 +1153,82 @@ bool merge::checkFileContent(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, cons
 			QFileInfo info1(file1);
 			QFileInfo info2(file2);
 			if (info1.lastModified() > info2.lastModified()) {
-				if (_difOnly) {
-					queueColor(0, 255, 0);
-					queuePrint(_logPrefix + f1 + L" [NEWER]\n");
+				if (_diffOnly) {
+					queueColor(Color::WHITE);
+					queuePrint(_logPrefix);
+					queueColor(Color::GREEN);
+					queuePrint(f1 + L" [NEWER]\n");
 				}
 				else {
 					// Delete old file
 					if (!file2.remove()) {
-						queueColor(255, 0, 0);
-						queuePrint(_logPrefix + L"Failed to delete outdated file (" + _d2.fullPath() + L"/" + f1 + L")\n");
+						queueColor(Color::WHITE);
+						queuePrint(_logPrefix);
+						queueColor(Color::RED);
+						queuePrint(L"Failed to delete outdated file (" + _d2.fullPath() + L"/" + f1 + L")\n");
 						return true;
 					}
 
 					// Copy newer file
 					if (!file1.copy(QString::fromStdWString(_d2.fullPath() + L"/" + f1))) {
-						queueColor(255, 0, 0);
-						queuePrint(_logPrefix + L"Failed to copy file (" + _d1.fullPath() + L"/" + f1 + L"  ->  " + _d2.fullPath() + L"/" + f1 + L")\n");
+						queueColor(Color::WHITE);
+						queuePrint(_logPrefix);
+						queueColor(Color::RED);
+						queuePrint(L"Failed to copy file (" + _d1.fullPath() + L"/" + f1 + L"  ->  " + _d2.fullPath() + L"/" + f1 + L")\n");
 						return true;
 					}
 
-					queueColor(255, 150, 50);
-					queuePrint(_logPrefix + L"                         Updated: " + _d2.fullPath() + L"/" + f1 + L"\n");
+					queueColor(Color::WHITE);
+					queuePrint(_logPrefix);
+					queueColor(Color::GREEN);
+					queuePrint(spacer + _d2.fullPath() + L"/" + f1 + L" [UPDATED]\n");
 				}
 			}
 			else if (info1.lastModified() < info2.lastModified()) {
-				if (_difOnly) {
-					queueColor(0, 255, 0);
-					queuePrint(_logPrefix + L"                         " + f1 + L" [NEWER]\n");
+				if (_diffOnly) {
+					queueColor(Color::WHITE);
+					queuePrint(_logPrefix);
+					queueColor(Color::GREEN);
+					queuePrint(spacer + f1 + L" [NEWER]\n");
 				}
 				else {
 					// Delete old file
 					if (!file1.remove()) {
-						queueColor(255, 0, 0);
-						queuePrint(_logPrefix + L"Failed to delete outdated file (" + _d1.fullPath() + L"/" + f1 + L")\n");
+						queueColor(Color::WHITE);
+						queuePrint(_logPrefix);
+						queueColor(Color::RED);
+						queuePrint(L"Failed to delete outdated file (" + _d1.fullPath() + L"/" + f1 + L")\n");
 						return true;
 					}
 
 					// Copy newer file
 					if (!file2.copy(QString::fromStdWString(_d1.fullPath() + L"/" + f1))) {
-						queueColor(255, 0, 0);
-						queuePrint(_logPrefix + L"Failed to copy file (" + _d2.fullPath() + L"/" + f1 + L"  ->  " + _d1.fullPath() + L"/" + f1 + L")\n");
+						queueColor(Color::WHITE);
+						queuePrint(_logPrefix);
+						queueColor(Color::RED);
+						queuePrint(L"Failed to copy file (" + _d2.fullPath() + L"/" + f1 + L"  ->  " + _d1.fullPath() + L"/" + f1 + L")\n");
 						return true;
 					}
-
-					queueColor(255, 150, 50);
-					queuePrint(_logPrefix + L"Updated: " + _d1.fullPath() + L"/" + f1 + L"\n");
+					
+					queueColor(Color::WHITE);
+					queuePrint(_logPrefix);
+					queueColor(Color::GREEN);
+					queuePrint(_d1.fullPath() + L"/" + f1 + L" [UPDATED]\n");
 				}
 			}
 			else {
-				queueColor(255, 150, 50);
-				queuePrint(_logPrefix + L"Can not merge \"" + f1 + L"\"\n");
-				queuePrint(_logPrefix + L"       ^-- Files differ with same last modified value\n");
-				if (!_difOnly) { return true; }
+				queueColor(Color::WHITE);
+				queuePrint(_logPrefix);
+				queueColor(Color::RED);
+				queuePrint(L"Can not merge \"" + f1 + L"\"\n");
+				queueColor(Color::WHITE);
+				queuePrint(_logPrefix);
+				queueColor(Color::RED);
+				queuePrint(L"        ^-- Files differ with same last modified value\n");
+				if (!_diffOnly) { return true; }
 			}
 			ret = true;
 		}
-
 	}
 
 	return ret;

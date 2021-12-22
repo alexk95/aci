@@ -14,15 +14,27 @@ aci::InterpreterObject::InterpreterObject() : m_printer(nullptr), m_core(nullptr
 // Output
 
 void aci::InterpreterObject::showInfo(void) {
-	showDelimiterLine();
+	printDelimiterLine();
 	print("###  ");
+	setColor(240, 70, 140);
 	print(key());
-	print("  ###\n\n");
+	setColor(255, 255, 255);
+	print("  ###\n");
+	printDelimiterLine();
+	print("\n");
 	showCommandInfo();
 }
 
-void aci::InterpreterObject::showDelimiterLine(void) {
-	print("##################################################\n");
+void aci::InterpreterObject::printDelimiterLine(void) {
+	setColor(0, 255, 0);
+	print("####################################################################################################\n");
+	setColor(255, 255, 255);
+}
+
+void aci::InterpreterObject::queueDelimiterLine(void) {
+	queueColor(0, 255, 0);
+	queuePrint("####################################################################################################\n");
+	queueColor(255, 255, 255);
 }
 
 // ################################################################################################################################
@@ -91,7 +103,7 @@ void aci::InterpreterObject::print(bool _value) {
 		setColor(255, 255, 255);
 	}
 	else {
-		setColor(0, 255, 0);
+		setColor(255, 0, 0);
 		print(L"FALSE");
 		setColor(255, 255, 255);
 	}
@@ -103,7 +115,7 @@ void aci::InterpreterObject::queuePrint(bool _value) {
 		queueColor(255, 255, 255);
 	}
 	else {
-		queueColor(0, 255, 0);
+		queueColor(255, 0, 0);
 		queuePrint(L"FALSE");
 		queueColor(255, 255, 255);
 	}
@@ -133,6 +145,9 @@ void aci::InterpreterObject::setColor(const Color& _color) {
 void aci::InterpreterObject::queueColor(const Color& _color) {
 	if (m_printer) { m_printer->setColorAsync(_color); }
 }
+
+void aci::InterpreterObject::setColor(Color::DefaultColor _color) { setColor(Color(_color)); }
+void aci::InterpreterObject::queueColor(Color::DefaultColor _color) { queueColor(Color(_color)); }
 
 // ################################################################################################################################
 

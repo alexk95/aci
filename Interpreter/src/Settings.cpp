@@ -58,7 +58,7 @@ bool Settings::handle(const std::wstring& _command, const std::list<std::wstring
 // Command handling
 
 void Settings::cmdConfiguration(void) {
-	showDelimiterLine();
+	printDelimiterLine();
 	print(L"###  ");
 	print(key());
 	print(L" configuration  ###\n\n");

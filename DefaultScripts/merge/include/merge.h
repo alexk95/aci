@@ -35,22 +35,22 @@ public:
 
 	// Merger
 
-	bool run(bool _difOnly);
+	bool run(bool _diffOnly);
 
-	void finishRun(bool _difOnly);
+	void finishRun(bool _diffOnly);
 
 protected:
 	virtual void showCommandInfo(void) override;
 
 private:
 
-	void performRun(bool _difOnly, aci::aDir _d1, aci::aDir _d2);
+	void performRun(bool _diffOnly, aci::aDir _d1, aci::aDir _d2);
 
-	bool checkDirectories(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix);
+	bool checkDirectories(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix);
 
-	bool checkFiles(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix);
+	bool checkFiles(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix);
 
-	bool checkFileContent(bool _difOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix);
+	bool checkFileContent(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, const std::wstring& _logPrefix);
 
 	std::wstring			m_pathOne;
 	std::wstring			m_pathTwo;
