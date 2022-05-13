@@ -38,6 +38,7 @@ SET ACI_UI=%ACI_ROOT%\Interpreter
 SET ACI_CORE=%ACI_ROOT%\Core
 SET ACI_EXAMPLE=%ACI_ROOT%\ScriptExample
 SET ACI_DEFAULT_MERGE=%ACI_ROOT%\DefaultScripts\merge
+SET ACI_DEFAULT_ODBC=%ACI_ROOT%\DefaultScripts\odbc
 SET ACI_DEFAULT_DEFAULT=%ACI_ROOT%\DefaultScripts\default
 
 REM Setup UI Core env
