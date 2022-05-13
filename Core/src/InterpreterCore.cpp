@@ -65,7 +65,7 @@ void InterpreterCore::setCurrentPath(const std::wstring& _path) {
 // Event handler
 
 bool InterpreterCore::handle(const std::wstring& _message) {
-	std::list<std::wstring> lst;
+	std::vector<std::wstring> lst;
 	extractClassicSyntax(lst, _message);
 
 	if (_message == L"?") {
@@ -161,7 +161,7 @@ bool InterpreterCore::handle(const std::wstring& _message) {
 	}
 }
 
-bool InterpreterCore::cmdData(const std::list<std::wstring>& _args) {
+bool InterpreterCore::cmdData(const std::vector<std::wstring>& _args) {
 	if (_args.empty()) {
 		if (m_printer) { m_printer->print(L"[ERROR] [INTERPRETER] [CMD]: Invalid number of arguments\n"); }
 		return false;
@@ -275,7 +275,7 @@ aci::InterpreterObject * InterpreterCore::findFirstMatchingItem(const std::wstri
 
 // Static functions
 
-void InterpreterCore::extractClassicSyntax(std::list<std::wstring>& _dest, const std::wstring& _origin) {
+void InterpreterCore::extractClassicSyntax(std::vector<std::wstring>& _dest, const std::wstring& _origin) {
 	bool isString{ false };
 	std::wstring temp;
 	wchar_t arr[2];

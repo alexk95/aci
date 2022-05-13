@@ -4,7 +4,7 @@ rm::rm() {}
 
 rm::~rm() {}
 
-bool rm::handle(const std::wstring& _command, const std::list<std::wstring>& _params) {
+bool rm::handle(const std::wstring& _command, const std::vector<std::wstring>& _params) {
 	bool dirs{ false };
 	bool subdirs{ false };
 	bool files{ false };

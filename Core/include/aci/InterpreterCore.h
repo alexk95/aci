@@ -7,6 +7,7 @@
 #include <aci/aciSharedDataTypes.h>
 
 #include <map>
+#include <vector>
 #include <list>
 #include <string>
 
@@ -36,7 +37,7 @@ namespace aci {
 		// Event handler
 
 		bool handle(const std::wstring& _message);
-		bool cmdData(const std::list<std::wstring>& _args);
+		bool cmdData(const std::vector<std::wstring>& _args);
 		void showHelp(void);
 		bool cmdCd(const std::wstring& _path);
 
@@ -51,7 +52,7 @@ namespace aci {
 
 		// Static functions
 
-		static void extractClassicSyntax(std::list<std::wstring>& _dest, const std::wstring& _origin);
+		static void extractClassicSyntax(std::vector<std::wstring>& _dest, const std::wstring& _origin);
 
 		// ########################################################################################
 

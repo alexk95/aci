@@ -23,7 +23,7 @@ merge::~merge() {
 
 }
 
-bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& _params) {
+bool merge::handle(const std::wstring& _command, const std::vector<std::wstring>& _params) {
 	if (_params.size() == 2) {
 		if (_params.back() == L"cfg") { cmdConfiguration(); return true; }
 		else if (_params.back() == L"clear") { cmdClear(); return true; }
@@ -36,7 +36,7 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 		}
 	}
 	else if (_params.size() == 3) {
-		if (*std::next(_params.begin()) == L"wd") {
+		if (_params[1] == L"wd") {
 			QString opt = QString::fromStdWString(_params.back());
 			opt = opt.toLower();
 			if (opt == "true" || opt == "1") {
@@ -53,14 +53,14 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 				return false;
 			}
 		}
-		else if (*std::next(_params.begin()) == L"+wd" || *std::next(_params.begin()) == L"wd+") {
+		else if (_params[1] == L"+wd" || _params[1] == L"wd+") {
 			for (auto itm : m_whiteListD) {
 				if (itm == _params.back()) { return true; }
 			}
 			m_whiteListD.push_back(_params.back());
 			return true;
 		}
-		else if (*std::next(_params.begin()) == L"-wd" || *std::next(_params.begin()) == L"wd-") {
+		else if (_params[1] == L"-wd" || _params[1] == L"wd-") {
 			if (_params.back() == L"*") { m_whiteListD.clear(); return true; }
 			for (auto it = m_whiteListD.begin(); it != m_whiteListD.end(); it++) {
 				if (*it == _params.back()) {
@@ -76,7 +76,7 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 			print("\" not found\n");
 			return false;
 		}
-		else if (*std::next(_params.begin()) == L"bd") {
+		else if (_params[1] == L"bd") {
 			QString opt = QString::fromStdWString(_params.back());
 			opt = opt.toLower();
 			if (opt == "true" || opt == "1") {
@@ -93,14 +93,14 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 				return false;
 			}
 		}
-		else if (*std::next(_params.begin()) == L"+bd" || *std::next(_params.begin()) == L"bd+") {
+		else if (_params[1] == L"+bd" || _params[1] == L"bd+") {
 			for (auto itm : m_blackListD) {
 				if (itm == _params.back()) { return true; }
 			}
 			m_blackListD.push_back(_params.back());
 			return true;
 		}
-		else if (*std::next(_params.begin()) == L"-bd" || *std::next(_params.begin()) == L"bd-") {
+		else if (_params[1] == L"-bd" || _params[1] == L"bd-") {
 			if (_params.back() == L"*") { m_blackListD.clear(); return true; }
 			for (auto it = m_blackListD.begin(); it != m_blackListD.end(); it++) {
 				if (*it == _params.back()) {
@@ -116,7 +116,7 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 			print("\" not found\n");
 			return false;
 		}
-		else if (*std::next(_params.begin()) == L"wf") {
+		else if (_params[1] == L"wf") {
 			QString opt = QString::fromStdWString(_params.back());
 			opt = opt.toLower();
 			if (opt == "true" || opt == "1") {
@@ -133,14 +133,14 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 				return false;
 			}
 		}
-		else if (*std::next(_params.begin()) == L"+wf" || *std::next(_params.begin()) == L"wf+") {
+		else if (_params[1] == L"+wf" || _params[1] == L"wf+") {
 			for (auto itm : m_whiteListF) {
 				if (itm == _params.back()) { return true; }
 			}
 			m_whiteListF.push_back(_params.back());
 			return true;
 		}
-		else if (*std::next(_params.begin()) == L"-wf" || *std::next(_params.begin()) == L"wf-") {
+		else if (_params[1] == L"-wf" || _params[1] == L"wf-") {
 			if (_params.back() == L"*") { m_whiteListF.clear(); return true; }
 			for (auto it = m_whiteListF.begin(); it != m_whiteListF.end(); it++) {
 				if (*it == _params.back()) {
@@ -156,7 +156,7 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 			print("\" not found\n");
 			return false;
 		}
-		else if (*std::next(_params.begin()) == L"bf") {
+		else if (_params[1] == L"bf") {
 			QString opt = QString::fromStdWString(_params.back());
 			opt = opt.toLower();
 			if (opt == "true" || opt == "1") {
@@ -173,14 +173,14 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 				return false;
 			}
 		}
-		else if (*std::next(_params.begin()) == L"+bf" || *std::next(_params.begin()) == L"bf+") {
+		else if (_params[1] == L"+bf" || _params[1] == L"bf+") {
 			for (auto itm : m_blackListF) {
 				if (itm == _params.back()) { return true; }
 			}
 			m_blackListF.push_back(_params.back());
 			return true;
 		}
-		else if (*std::next(_params.begin()) == L"-bf" || *std::next(_params.begin()) == L"bf+") {
+		else if (_params[1] == L"-bf" || _params[1] == L"bf+") {
 			if (_params.back() == L"*") { m_blackListF.clear(); return true; }
 			for (auto it = m_blackListF.begin(); it != m_blackListF.end(); it++) {
 				if (*it == _params.back()) {
@@ -196,21 +196,21 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 			print("\" not found\n");
 			return false;
 		}
-		else if (*std::next(_params.begin()) == L"save") {
+		else if (_params[1] == L"save") {
 			return cmdSave(QString::fromStdWString(_params.back()));
 		}
-		else if (*std::next(_params.begin()) == L"load") {
+		else if (_params[1] == L"load") {
 			return cmdLoad(QString::fromStdWString(_params.back()));
 		}
-		else if (*std::next(_params.begin()) == L"d1") {
+		else if (_params[1] == L"d1") {
 			m_pathOne = _params.back();
 			return true;
 		}
-		else if (*std::next(_params.begin()) == L"d2") {
+		else if (_params[1] == L"d2") {
 			m_pathTwo = _params.back();
 			return true;
 		}
-		else if (*std::next(_params.begin()) == L"top") {
+		else if (_params[1] == L"top") {
 			QString opt = QString::fromStdWString(_params.back());
 			opt = opt.toLower();
 			if (opt == "true" || opt == "1") { m_searchTopDirectoryOnly = true; return true; }
@@ -221,7 +221,7 @@ bool merge::handle(const std::wstring& _command, const std::list<std::wstring>& 
 				return false;
 			}
 		}
-		else if (*std::next(_params.begin()) == L"auto") {
+		else if (_params[1] == L"auto") {
 			QString opt = QString::fromStdWString(_params.back());
 			opt = opt.toLower();
 			if (opt == "true" || opt == "1") { m_autoMerge = true; return true; }

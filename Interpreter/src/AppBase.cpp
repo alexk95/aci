@@ -319,8 +319,14 @@ void AppBase::loadScripts(void) {
 	aci::InterpreterCore * i = aci::API::core();
 	print(L"Adding settings as a script\n");
 	i->addScriptObject(Settings::instance());
+#ifdef _DEBUG
+	print(L"Load *.dll scripts from " + Settings::instance()->dataPath() + L"/ScriptsD\n");
+	aci::API::core()->scriptLoader()->loadDllsFromDirectory(Settings::instance()->dataPath() + L"/ScriptsD");
+#else
 	print(L"Load *.dll scripts from " + Settings::instance()->dataPath() + L"/Scripts\n");
 	aci::API::core()->scriptLoader()->loadDllsFromDirectory(Settings::instance()->dataPath() + L"/Scripts");
+#endif // _DEBUG
+
 
 	//print(L"Load merge script\n");
 	//aci::API::core()->scriptLoader()->loadDllsFromDirectory(QString(qgetenv("ACI_DEFAULT_MERGE") + "\\x64\\Debug\\").toStdWString());
@@ -420,7 +426,7 @@ void AppBase::slotTabPressOnInput(void) {
 	if (m_lastCommand.isEmpty()) { return; }
 	
 	// Get input
-	std::list<std::wstring> lst;
+	std::vector<std::wstring> lst;
 	aci::API::core()->extractClassicSyntax(lst, m_lastCommand.toStdWString());
 
 	if (lst.size() == 0) { return; }

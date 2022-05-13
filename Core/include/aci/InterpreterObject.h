@@ -4,6 +4,7 @@
 #include <aci/InterpreterObject.h>
 #include <aci/Color.h>
 
+#include <vector>
 #include <list>
 #include <string>
 
@@ -19,7 +20,7 @@ namespace aci {
 
 		virtual std::wstring key(void) const = 0;
 
-		virtual bool handle(const std::wstring& _command, const std::list<std::wstring>& _params) = 0;
+		virtual bool handle(const std::wstring& _command, const std::vector<std::wstring>& _params) = 0;
 
 		// ################################################################################################################################
 

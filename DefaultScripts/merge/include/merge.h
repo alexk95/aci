@@ -15,7 +15,7 @@ public:
 
 	virtual std::wstring key(void) const override { return L"merge"; }
 
-	virtual bool handle(const std::wstring& _command, const std::list<std::wstring>& _params) override;
+	virtual bool handle(const std::wstring& _command, const std::vector<std::wstring>& _params) override;
 
 	// #####################################################################################################
 

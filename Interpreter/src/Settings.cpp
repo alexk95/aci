@@ -24,7 +24,7 @@ void Settings::clearInstance(void) {
 
 // Base class functions
 
-bool Settings::handle(const std::wstring& _command, const std::list<std::wstring>& _params) {
+bool Settings::handle(const std::wstring& _command, const std::vector<std::wstring>& _params) {
 	if (_params.size() == 2) {
 		if (_params.back() == L"cfg") {
 			cmdConfiguration();
@@ -32,9 +32,7 @@ bool Settings::handle(const std::wstring& _command, const std::list<std::wstring
 		}
 	}
 	else if (_params.size() == 3) {
-		auto it = _params.begin();
-		it++;
-		if (*it == L"data") {
+		if (_params[1] == L"data") {
 			QDir d(QString::fromStdWString(_params.back()));
 			if (!d.exists()) {
 				setColor(255, 0, 0);
