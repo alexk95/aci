@@ -1,5 +1,6 @@
 #include <aci/ScriptLoader.h>
 #include <aci/InterpreterCore.h>
+#include <aci/InterpreterObject.h>
 #include <aci/AbstractPrinter.h>
 #include <aci/ExternalDllScript.h>
 #include <aci/aDir.h>
@@ -15,7 +16,7 @@ void aci::ScriptLoader::loadDll(const std::wstring& _path, const std::wstring& _
 	m_core->printer()->setColor(255, 255, 255);
 	m_core->printer()->print(L"[script loader] Load library: " + _filename);
 	HINSTANCE hGetProcIDDLL = LoadLibrary(_path.c_str());
-
+	
 	if (hGetProcIDDLL) {
 		// Resolve function address here
 		ExternalDllScript::DLLGenerateObjectsFunctionType func = (ExternalDllScript::DLLGenerateObjectsFunctionType)GetProcAddress(hGetProcIDDLL, "generateObjects");
@@ -26,9 +27,10 @@ void aci::ScriptLoader::loadDll(const std::wstring& _path, const std::wstring& _
 			
 			for (int o{ 0 }; o < objCt; o++) {
 				if (obj[o]) {
-					ExternalDllScript * newScript = new ExternalDllScript(hGetProcIDDLL, func, obj[o]);
+					ExternalDllScript * newScript = new ExternalDllScript(hGetProcIDDLL, func, obj[o], _path);
 					m_core->addScriptObject(obj[o]);
 					ct++;
+					m_externalDlls.push_back(newScript);
 				}
 			}
 
@@ -66,4 +68,13 @@ void aci::ScriptLoader::loadDllsFromDirectory(const std::wstring& _directoryPath
 	for (auto file : directory.files()) {
 		loadDll(file->fullPath(), file->name());
 	}
+}
+
+void aci::ScriptLoader::unloadScripts(void) {
+	for (auto script : m_externalDlls) {
+		m_core->removeScriptObject(script->interptreterObject()->key(), true);
+		FreeLibrary(script->libraryInstance());
+		delete script;
+	}
+	m_externalDlls.clear();
 }

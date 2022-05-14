@@ -30,6 +30,7 @@ namespace aci {
 		void setAutoClean(bool _isAutoClean) { m_autoClean = _isAutoClean; }
 		void attachPrinter(aci::AbstractPrinter * _printer);
 		void addScriptObject(aci::InterpreterObject * _obj);
+		void removeScriptObject(const std::wstring& _key, bool _deleteObject = true);
 		void setCurrentPath(const std::wstring& _path);
 
 		// ########################################################################################

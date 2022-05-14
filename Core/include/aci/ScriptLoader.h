@@ -20,6 +20,8 @@ namespace aci {
 		void loadDll(const std::wstring& _path, const std::wstring& _filename);
 		void loadDllsFromDirectory(const std::wstring& _directoryPath);
 
+		void unloadScripts(void);
+
 	private:
 		
 		std::list<ExternalDllScript *>	m_externalDlls;

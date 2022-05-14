@@ -1,6 +1,7 @@
 #include <aci/API.h>
 #include <aci/InterpreterCore.h>
 #include <aci/OS.h>
+#include <aci/ScriptLoader.h>
 #include <cassert>
 
 bool initialized{ false };
@@ -31,7 +32,10 @@ void aci::API::cleanUp(void) noexcept {
 		assert(0);		// API was not initialized before
 		return;
 	}
+	InterpreterCore::instance()->scriptLoader()->unloadScripts();
+	OS::clearInstance();
 	InterpreterCore::clearInstance();
+	initialized = false;
 }
 
 aci::InterpreterCore * aci::API::core(void) {

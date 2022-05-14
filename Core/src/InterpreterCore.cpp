@@ -49,6 +49,13 @@ void InterpreterCore::addScriptObject(aci::InterpreterObject * _obj) {
 	_obj->attachPrinter(m_printer);
 }
 
+void InterpreterCore::removeScriptObject(const std::wstring& _key, bool _deleteObject) {
+	auto it = m_objects.find(_key);
+	if (it == m_objects.end()) return;
+	if (_deleteObject) delete it->second;
+	m_objects.erase(_key);
+}
+
 void InterpreterCore::setCurrentPath(const std::wstring& _path) {
 	m_path.clear();
 	if (_path.empty()) { return; }
