@@ -210,6 +210,7 @@ bool source::handle(const std::wstring& _command, const std::vector<std::wstring
 		else if (_params[1] == L"lang" || _params[1] == L"language") {
 			if (_params[2] == L"c++") m_language = L"c++";
 			else m_language = L"";
+			return true;
 		}
 		else if (_params[1] == L"top") {
 			QString opt = QString::fromStdWString(_params.back());
@@ -232,77 +233,86 @@ bool source::handle(const std::wstring& _command, const std::vector<std::wstring
 // #####################################################################################################
 
 void source::cmdConfiguration(void) {
-	printDelimiterLine();
+
 	setColor(Color::WHITE);
-	print(L"###  ");
+	print(m_prefix);
+	printDelimiterLine();
+	print(m_prefix + L"###  ");
 	setColor(Color::PURPLE);
 	print(key() + L" configuration");
 	setColor(Color::WHITE);
 	print(L"  ###\n");
-	
+	print(m_prefix);
 	printDelimiterLine();
+	
 	print(L"\n");
-	print(L"Directory:                       ");
+	print(m_prefix + L"Directory:                       ");
 	setColor(Color::ORANGE);
 	if (m_path.empty()) { print(L"<empty>\n"); }
 	else { print(m_path + L"\n"); }
 	setColor(Color::WHITE);
 
 
-	print("Search only top level directory: ");
+	print(m_prefix + L"Search only top level directory: ");
 	print(m_searchTopDirectoryOnly);
 	setColor(Color::WHITE);
 	print("\n");
 
-	print("Whilelist (directories) active:  ");
+	print(m_prefix + L"Language:                        ");
+	setColor(Color::ORANGE);
+	if (m_language.empty()) print("<none>\n");
+	else print(m_language + L"\n");
+	setColor(Color::WHITE);	
+
+	print(m_prefix + L"Whilelist (directories) active:  ");
 	print(m_whiteListDActive);
 	setColor(Color::WHITE);
 	print("\n");
 
-	print("Whitelist (directories):\n");
+	print(m_prefix + L"Whitelist (directories):\n");
 	setColor(Color::ORANGE);
-	if (m_whiteListD.empty()) { print("\t<empty>\n"); }
+	if (m_whiteListD.empty()) { print(m_prefix + L"\t<empty>\n"); }
 	else {
-		for (auto itm : m_whiteListD) { print(L"\t" + itm + L"\n"); }
+		for (auto itm : m_whiteListD) { print(m_prefix + L"\t" + itm + L"\n"); }
 	}
 	setColor(Color::WHITE);
 
-	print("Blacklist (directories) active:  ");
+	print(m_prefix + L"Blacklist (directories) active:  ");
 	print(m_blackListDActive);
 	setColor(Color::WHITE);
 	print("\n");
 
-	print("Blacklist (directories):\n");
+	print(m_prefix + L"Blacklist (directories):\n");
 	setColor(Color::ORANGE);
-	if (m_blackListD.empty()) { print("\t<empty>\n"); }
+	if (m_blackListD.empty()) { print(m_prefix + L"\t<empty>\n"); }
 	else {
-		for (auto itm : m_blackListD) { print(L"\t" + itm + L"\n"); }
+		for (auto itm : m_blackListD) { print(m_prefix + L"\t" + itm + L"\n"); }
 	}
 	setColor(Color::WHITE);
 
-	print("Whilelist (files) active:        ");
+	print(m_prefix + L"Whilelist (files) active:        ");
 	print(m_whiteListFActive);
 	setColor(Color::WHITE);
 	print("\n");
 
-	print("Whitelist (files):\n");
+	print(m_prefix + L"Whitelist (files):\n");
 	setColor(Color::ORANGE);
-	if (m_whiteListF.empty()) { print("\t<empty>\n"); }
+	if (m_whiteListF.empty()) { print(m_prefix + L"\t<empty>\n"); }
 	else {
-		for (auto itm : m_whiteListF) { print(L"\t" + itm + L"\n"); }
+		for (auto itm : m_whiteListF) { print(m_prefix + L"\t" + itm + L"\n"); }
 	}
 	setColor(Color::WHITE);
 
-	print("Blacklist (files) active:        ");
+	print(m_prefix + L"Blacklist (files) active:        ");
 	print(m_blackListFActive);
 	setColor(Color::WHITE);
 	print("\n");
 
-	print("Blacklist (files):\n");
+	print(m_prefix + L"Blacklist (files):\n");
 	setColor(Color::ORANGE);
-	if (m_blackListF.empty()) { print("\t<empty>\n"); }
+	if (m_blackListF.empty()) { print(m_prefix + L"\t<empty>\n"); }
 	else {
-		for (auto itm : m_blackListF) { print(L"\t" + itm + L"\n"); }
+		for (auto itm : m_blackListF) { print(m_prefix + L"\t" + itm + L"\n"); }
 	}
 	setColor(Color::WHITE);
 }
@@ -809,7 +819,7 @@ void source::performRun(aci::aDir _dir, RunMode _mode) {
 			queueColor(Color::WHITE);
 			queuePrint(m_prefix + L"Not empty lines of text: ");
 			queueColor(Color::GREEN);
-			queuePrint(QString::number(lineCount).toStdString() + "\n");
+			queuePrint(QString::number(lineCountNotEmpty).toStdString() + "\n");
 
 			queueColor(Color::WHITE);
 			queuePrint(m_prefix + L"Lines of code:           ");
