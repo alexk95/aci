@@ -802,8 +802,9 @@ void source::performRun(aci::aDir _dir, RunMode _mode) {
 			unsigned long long lineCount(0);
 			unsigned long long lineCountNotEmpty(0);
 			unsigned long long lineCountCode(0);
+			std::map<QString, unsigned long long> additionalInformation;
 
-			scanFiles(_dir, files, lineCount, lineCountNotEmpty, lineCountCode);
+			scanFiles(_dir, files, lineCount, lineCountNotEmpty, lineCountCode, additionalInformation);
 
 			queuePrint("\n");
 			queueColor(Color::WHITE);
@@ -825,6 +826,15 @@ void source::performRun(aci::aDir _dir, RunMode _mode) {
 			queuePrint(m_prefix + L"Lines of code:           ");
 			queueColor(Color::GREEN);
 			queuePrint(QString::number(lineCountCode).toStdString() + "\n\n");
+
+			for (auto it : additionalInformation) {
+				queueColor(Color::WHITE);
+				queuePrint(m_prefix + it.first.toStdWString());
+				queueColor(Color::GREEN);
+				queuePrint(QString::number(it.second).toStdString() + "\n");
+			}
+			queuePrint("\n");
+
 		}
 		else if (_mode == FILESONLY) {
 			scanFilenames(L"../", _dir);
@@ -864,7 +874,7 @@ void source::scanFilenames(const std::wstring& _pathPrefix, const aci::aDir& _di
 	}
 }
 
-void source::scanFiles(const aci::aDir& _dir, unsigned long long& _files, unsigned long long& _textLines, unsigned long long& _nonEmptyLines, unsigned long long& _sourceLines) {
+void source::scanFiles(const aci::aDir& _dir, unsigned long long& _files, unsigned long long& _textLines, unsigned long long& _nonEmptyLines, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation) {
 	for (auto file : _dir.files()) {
 		QFile actualFile(QString::fromStdWString(file->fullPath()));
 		if (actualFile.open(QIODevice::ReadOnly)) {
@@ -883,7 +893,7 @@ void source::scanFiles(const aci::aDir& _dir, unsigned long long& _files, unsign
 					line.remove("\t");
 					if (!line.isEmpty() && line != "\n") {
 						_nonEmptyLines++;
-						if (m_language == L"c++") checkSyntaxCPP(line, isComment, _sourceLines);
+						if (m_language == L"c++") checkSyntaxCPP(line, isComment, _sourceLines, _additionalInformation);
 						else _sourceLines++;
 					}
 				}
@@ -899,12 +909,12 @@ void source::scanFiles(const aci::aDir& _dir, unsigned long long& _files, unsign
 	}
 
 	for (auto subdir : _dir.subdirectories()) {
-		scanFiles(*subdir, _files, _textLines, _nonEmptyLines, _sourceLines);
+		scanFiles(*subdir, _files, _textLines, _nonEmptyLines, _sourceLines, _additionalInformation);
 	}
 
 }
 
-void source::checkSyntaxCPP(const QString& _line, bool& _isComment, unsigned long long& _sourceLines) {
+void source::checkSyntaxCPP(const QString& _line, bool& _isComment, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation) {
 	bool added{ false };
 
 	if (_line.startsWith("//")) return;
@@ -938,5 +948,20 @@ void source::checkSyntaxCPP(const QString& _line, bool& _isComment, unsigned lon
 		else _isComment = false;
 		return;
 	}
-	if (!_isComment) _sourceLines++;
+	if (!_isComment) {
+		_sourceLines++;
+		lineHasKey(_line, "if", "if:                      ", _additionalInformation);
+		lineHasKey(_line, "switch", "switch:                  ", _additionalInformation);
+		lineHasKey(_line, "for", "for:                     ", _additionalInformation);
+		lineHasKey(_line, "while", "while:                   ", _additionalInformation);
+		lineHasKey(_line, "return", "return:                  ", _additionalInformation);
+	}
+}
+
+void source::lineHasKey(const QString& _line, const QString& _key, const QString& _keyName, std::map<QString, unsigned long long>& _informationMap) {
+	if (_line.contains(_key)) {
+		auto it = _informationMap.find(_keyName);
+		if (it == _informationMap.end()) _informationMap.insert_or_assign(_keyName, 1);
+		else _informationMap.insert_or_assign(_keyName, it->second + 1);
+	}
 }

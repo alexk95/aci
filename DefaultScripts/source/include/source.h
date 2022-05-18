@@ -6,6 +6,7 @@
 
 #include <qstring.h>
 
+#include <map>
 #include <list>
 
 class SOURCE_EXPORT source : public aci::InterpreterObject {
@@ -56,9 +57,11 @@ private:
 
 	void scanFilenames(const std::wstring& _pathPrefix, const aci::aDir& _dir);
 
-	void scanFiles(const aci::aDir& _dir, unsigned long long& _files, unsigned long long& _textLines, unsigned long long& _nonEmptyLines, unsigned long long& _sourceLines);
+	void scanFiles(const aci::aDir& _dir, unsigned long long& _files, unsigned long long& _textLines, unsigned long long& _nonEmptyLines, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation);
 
-	void checkSyntaxCPP(const QString& _line, bool& _isComment, unsigned long long& _sourceLines);
+	void checkSyntaxCPP(const QString& _line, bool& _isComment, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation);
+
+	void lineHasKey(const QString& _line, const QString& _key, const QString& _keyName, std::map<QString, unsigned long long>& _informationMap);
 
 	std::wstring			m_path;
 	std::wstring			m_prefix;
