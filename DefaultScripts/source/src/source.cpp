@@ -935,6 +935,7 @@ void source::checkSyntaxCPP(const QString& _line, bool& _isComment, unsigned lon
 				_isComment = false;
 			}
 		}
+		else _isComment = false;
 		return;
 	}
 	if (!_isComment) _sourceLines++;
