@@ -223,6 +223,9 @@ bool source::handle(const std::wstring& _command, const std::vector<std::wstring
 				return false;
 			}
 		}
+		else if (_params[1] == L"find") {
+			return find(_params[2]);
+		}
 	}
 
 	setColor(Color::RED);
@@ -636,14 +639,31 @@ bool source::run(RunMode _mode) {
 	return true;
 }
 
-// #####################################################################################################
+bool source::find(const std::wstring& _text) {
+	if (m_path.empty()) {
+		setColor(Color::WHITE);
+		print(m_prefix);
+		setColor(Color::RED);
+		print(L"Directory is empty\n");
+		return false;
+	}
 
-// Slots
+	// Check the directories
+	aci::aDir dir(L"", m_path);
 
-void source::finishRun() {
-	queueColor(Color::WHITE);
-	queuePrint(m_prefix + L"Done\n");
-	queueEnableInput();
+	if (!dir.exists()) {
+		setColor(Color::WHITE);
+		print(m_prefix);
+		setColor(Color::RED);
+		print(L"The directory \"" + m_path + L"\" does not exist\n");
+		return false;
+	}
+
+	disableInput();
+
+	std::thread t1(&source::performFind, this, dir, _text);
+	t1.detach();
+	return true;
 }
 
 // #####################################################################################################
@@ -751,6 +771,9 @@ void source::showCommandInfo(void) {
 	setColor(Color::YELLOW);
 	print(L"-bd *             Will clear the directories blacklist\n");
 	setColor(Color::WHITE);
+
+	print(m_prefix + L"\t");
+	print(L"find <text>       Will scan all files and display the files that contain the given text\n");
 }
 
 // #####################################################################################################
@@ -804,7 +827,7 @@ void source::performRun(aci::aDir _dir, RunMode _mode) {
 			unsigned long long lineCountCode(0);
 			std::map<QString, unsigned long long> additionalInformation;
 
-			scanFiles(_dir, files, lineCount, lineCountNotEmpty, lineCountCode, additionalInformation);
+			runScanFiles(_dir, files, lineCount, lineCountNotEmpty, lineCountCode, additionalInformation);
 
 			queuePrint("\n");
 			queueColor(Color::WHITE);
@@ -837,32 +860,95 @@ void source::performRun(aci::aDir _dir, RunMode _mode) {
 
 		}
 		else if (_mode == FILESONLY) {
-			scanFilenames(L"../", _dir);
+			runScanFilenames(L"../", _dir);
 		}
 		else if (_mode == DIRSONLY) {
-			scanDirectories(L"../", _dir);
+			runScanDirectories(L"../", _dir);
 		}
 	}
 	catch (const std::exception& _e) {
 		queuePrint(m_prefix + L"Error: ");
 		queuePrint(std::string(_e.what()) + "\n");
-		finishRun();
+		finishPerform();
 		return;
 	}
-	finishRun();
+	finishPerform();
 }
 
-void source::scanDirectories(const std::wstring& _pathPrefix, const aci::aDir& _dir) {
+void source::performFind(aci::aDir _dir, const std::wstring& _text) {
+	try {
+
+		// Scan
+
+		queuePrint(m_prefix + L"Scanning: Directory\n");
+		_dir.scanAll();
+
+		queuePrint(m_prefix + L"Directory information (no filter) loaded with:\n\t- Directories: " +
+			QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
+
+		// #########################################################################################################################
+
+		// Apply filter
+
+		if (m_whiteListDActive) {
+			queuePrint(m_prefix + L"Applying filter: Directory: Whitelist\n");
+			_dir.filterDirectoriesWithWhitelist(m_whiteListD);
+		}
+		if (m_blackListDActive) {
+			queuePrint(m_prefix + L"Applying filter: Directory: Blacklist\n");
+			_dir.filterDirectoriesWithBlacklist(m_blackListD);
+		}
+		if (m_whiteListFActive) {
+			queuePrint(m_prefix + L"Applying filter: File: Whitelist\n");
+			_dir.filterFilesWithWhitelist(m_whiteListF);
+		}
+		if (m_blackListFActive) {
+			queuePrint(m_prefix + L"Applying filter: File: Blacklist\n");
+			_dir.filterFilesWithBlacklist(m_blackListF);
+		}
+
+		queuePrint(m_prefix + L"Directory information filtered with remaining:\n\t- Directories: " +
+			QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
+
+		// #########################################################################################################################
+
+		// Check dirs
+
+		std::list<std::pair<std::wstring, unsigned long long>> matches;
+		findScanDirectory(_dir, L"..", QString::fromStdWString(_text), matches);
+
+		size_t longestPath = 0;
+		for (auto m : matches) {
+			if (m.first.length() > longestPath) longestPath = m.first.length();
+		}
+		longestPath += 4;
+
+		queuePrint(L"\n" + fillString(L"File", longestPath) + L"Line\n");
+		for (auto m : matches) {
+			queuePrint(fillString(m.first, longestPath) + std::to_wstring(m.second) + L"\n");
+		}
+
+	}
+	catch (const std::exception& _e) {
+		queuePrint(m_prefix + L"Error: ");
+		queuePrint(std::string(_e.what()) + "\n");
+		finishPerform();
+		return;
+	}
+	finishPerform();
+}
+
+void source::runScanDirectories(const std::wstring& _pathPrefix, const aci::aDir& _dir) {
 	for (auto dir : _dir.subdirectories()) {
 		queueColor(Color::WHITE);
 		queuePrint(m_prefix);
 		queueColor(Color::GREEN);
 		queuePrint(_pathPrefix + dir->name() + L"\n");
-		scanDirectories(_pathPrefix + dir->name() + L"/", *dir);
+		runScanDirectories(_pathPrefix + dir->name() + L"/", *dir);
 	}
 }
 
-void source::scanFilenames(const std::wstring& _pathPrefix, const aci::aDir& _dir) {
+void source::runScanFilenames(const std::wstring& _pathPrefix, const aci::aDir& _dir) {
 	for (auto f : _dir.files()) {
 		queueColor(Color::WHITE);
 		queuePrint(m_prefix);
@@ -870,11 +956,11 @@ void source::scanFilenames(const std::wstring& _pathPrefix, const aci::aDir& _di
 		queuePrint(_pathPrefix + f->name() + L"\n");
 	}
 	for (auto dir : _dir.subdirectories()) {
-		scanFilenames(_pathPrefix + dir->name() + L"/", *dir);
+		runScanFilenames(_pathPrefix + dir->name() + L"/", *dir);
 	}
 }
 
-void source::scanFiles(const aci::aDir& _dir, unsigned long long& _files, unsigned long long& _textLines, unsigned long long& _nonEmptyLines, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation) {
+void source::runScanFiles(const aci::aDir& _dir, unsigned long long& _files, unsigned long long& _textLines, unsigned long long& _nonEmptyLines, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation) {
 	for (auto file : _dir.files()) {
 		QFile actualFile(QString::fromStdWString(file->fullPath()));
 		if (actualFile.open(QIODevice::ReadOnly)) {
@@ -893,7 +979,7 @@ void source::scanFiles(const aci::aDir& _dir, unsigned long long& _files, unsign
 					line.remove("\t");
 					if (!line.isEmpty() && line != "\n") {
 						_nonEmptyLines++;
-						if (m_language == L"c++") checkSyntaxCPP(line, isComment, _sourceLines, _additionalInformation);
+						if (m_language == L"c++") runCheckSyntaxCPP(line, isComment, _sourceLines, _additionalInformation);
 						else _sourceLines++;
 					}
 				}
@@ -909,12 +995,12 @@ void source::scanFiles(const aci::aDir& _dir, unsigned long long& _files, unsign
 	}
 
 	for (auto subdir : _dir.subdirectories()) {
-		scanFiles(*subdir, _files, _textLines, _nonEmptyLines, _sourceLines, _additionalInformation);
+		runScanFiles(*subdir, _files, _textLines, _nonEmptyLines, _sourceLines, _additionalInformation);
 	}
 
 }
 
-void source::checkSyntaxCPP(const QString& _line, bool& _isComment, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation) {
+void source::runCheckSyntaxCPP(const QString& _line, bool& _isComment, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation) {
 	bool added{ false };
 
 	if (_line.startsWith("//")) return;
@@ -950,18 +1036,62 @@ void source::checkSyntaxCPP(const QString& _line, bool& _isComment, unsigned lon
 	}
 	if (!_isComment) {
 		_sourceLines++;
-		lineHasKey(_line, "if", "if:                      ", _additionalInformation);
-		lineHasKey(_line, "switch", "switch:                  ", _additionalInformation);
-		lineHasKey(_line, "for", "for:                     ", _additionalInformation);
-		lineHasKey(_line, "while", "while:                   ", _additionalInformation);
-		lineHasKey(_line, "return", "return:                  ", _additionalInformation);
+		runLineHasKey(_line, "if", "if:                      ", _additionalInformation);
+		runLineHasKey(_line, "switch", "switch:                  ", _additionalInformation);
+		runLineHasKey(_line, "for", "for:                     ", _additionalInformation);
+		runLineHasKey(_line, "while", "while:                   ", _additionalInformation);
+		runLineHasKey(_line, "return", "return:                  ", _additionalInformation);
 	}
 }
 
-void source::lineHasKey(const QString& _line, const QString& _key, const QString& _keyName, std::map<QString, unsigned long long>& _informationMap) {
+void source::runLineHasKey(const QString& _line, const QString& _key, const QString& _keyName, std::map<QString, unsigned long long>& _informationMap) {
 	if (_line.contains(_key)) {
 		auto it = _informationMap.find(_keyName);
 		if (it == _informationMap.end()) _informationMap.insert_or_assign(_keyName, 1);
 		else _informationMap.insert_or_assign(_keyName, it->second + 1);
 	}
+}
+
+void source::findScanDirectory(const aci::aDir& _dir, const std::wstring& _shortPath, const QString& _textToFind, std::list<std::pair<std::wstring, unsigned long long>>& _matches) {
+	// Check files
+	for (auto f : _dir.files()) {
+		QFile actualFile(QString::fromStdWString(f->fullPath()));
+		if (actualFile.open(QIODevice::ReadOnly)) {
+			QTextStream stream(&actualFile);
+
+			unsigned long long lineCt = 0;
+			while (!stream.atEnd()) {
+				QString line = stream.readLine();
+				lineCt++;
+				QRegExp rx(_textToFind);
+				rx.setMinimal(true);
+				if (line.contains(rx)) 
+					_matches.push_back(std::pair<std::wstring, unsigned long long>(_shortPath + L"/" + f->name(), lineCt));
+			}
+			actualFile.close();
+		}
+		else {
+			queueColor(Color::WHITE);
+			queuePrint(m_prefix);
+			queueColor(Color::RED);
+			queuePrint(L"Failed to open file for reading: " + f->fullPath() + L"\n");
+		}
+	}
+
+	// Check directories
+	for (auto d : _dir.subdirectories()) {
+		findScanDirectory(*d, _shortPath + L"/" + d->name(), _textToFind, _matches);
+	}
+}
+
+void source::finishPerform() {
+	queueColor(Color::WHITE);
+	queuePrint(m_prefix + L"Done\n");
+	queueEnableInput();
+}
+
+std::wstring source::fillString(const std::wstring& _original, size_t _length) {
+	std::wstring ret(_original);
+	while (ret.length() < _length) ret.append(L" ");
+	return ret;
 }

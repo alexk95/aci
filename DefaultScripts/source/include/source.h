@@ -44,7 +44,7 @@ public:
 
 	bool run(RunMode _mode);
 
-	void finishRun();
+	bool find(const std::wstring& _text);
 
 protected:
 	virtual void showCommandInfo(void) override;
@@ -53,15 +53,23 @@ private:
 
 	void performRun(aci::aDir _dir, RunMode _mode);
 
-	void scanDirectories(const std::wstring& _pathPrefix, const aci::aDir& _dir);
+	void performFind(aci::aDir _dir, const std::wstring& _text);
 
-	void scanFilenames(const std::wstring& _pathPrefix, const aci::aDir& _dir);
+	void runScanDirectories(const std::wstring& _pathPrefix, const aci::aDir& _dir);
 
-	void scanFiles(const aci::aDir& _dir, unsigned long long& _files, unsigned long long& _textLines, unsigned long long& _nonEmptyLines, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation);
+	void runScanFilenames(const std::wstring& _pathPrefix, const aci::aDir& _dir);
 
-	void checkSyntaxCPP(const QString& _line, bool& _isComment, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation);
+	void runScanFiles(const aci::aDir& _dir, unsigned long long& _files, unsigned long long& _textLines, unsigned long long& _nonEmptyLines, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation);
 
-	void lineHasKey(const QString& _line, const QString& _key, const QString& _keyName, std::map<QString, unsigned long long>& _informationMap);
+	void runCheckSyntaxCPP(const QString& _line, bool& _isComment, unsigned long long& _sourceLines, std::map<QString, unsigned long long>& _additionalInformation);
+
+	void runLineHasKey(const QString& _line, const QString& _key, const QString& _keyName, std::map<QString, unsigned long long>& _informationMap);
+
+	void findScanDirectory(const aci::aDir& _dir, const std::wstring& _shortPath, const QString& _textToFind, std::list<std::pair<std::wstring, unsigned long long>>& _matches);
+
+	void finishPerform();
+
+	static std::wstring fillString(const std::wstring& _original, size_t _length);
 
 	std::wstring			m_path;
 	std::wstring			m_prefix;

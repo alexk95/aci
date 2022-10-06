@@ -80,7 +80,7 @@ AppBase::AppBase(int _argc, char ** _argv)
 	m_in->setObjectName("a_input");
 	m_inLabel = new aLabelWidget("<:");
 	m_inLabel->setObjectName("a_inputLabel");
-
+	
 	// Setup layouts
 	m_tabView->addTab(m_out, "Output");
 	m_inLayout->addWidget(m_inLabel, 0);
