@@ -31,8 +31,6 @@ IF "%QTDIR_ROOT%" == "" (
 	goto END
 )
 
-SET QTDIR=%QDIR%
-
 REM Set project paths
 SET ACI_UI=%ACI_ROOT%\Interpreter
 SET ACI_CORE=%ACI_ROOT%\Core
