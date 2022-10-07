@@ -54,7 +54,7 @@ void aci::ScriptLoader::loadDll(const std::wstring& _path, const std::wstring& _
 	}
 	else {
 		m_core->printer()->setColor(255, 0, 0);
-		m_core->printer()->print(L"  FAILED (dll not loaded)\n");
+		m_core->printer()->print(L"  FAILED (dll not loaded. Error code: " + std::to_wstring(GetLastError()) + L")\n");
 	}
 }
 
