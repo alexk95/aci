@@ -917,17 +917,24 @@ void source::performFind(aci::aDir _dir, const std::wstring& _text) {
 		std::list<std::pair<std::wstring, unsigned long long>> matches;
 		findScanDirectory(_dir, L"..", QString::fromStdWString(_text), matches);
 
-		size_t longestPath = 0;
-		for (auto m : matches) {
-			if (m.first.length() > longestPath) longestPath = m.first.length();
-		}
-		longestPath += 4;
+		if (!matches.empty()) {
+			size_t longestPath = 0;
+			for (auto m : matches) {
+				if (m.first.length() > longestPath) longestPath = m.first.length();
+			}
+			longestPath += 4;
 
-		print(L"\n" + fillString(L"File", longestPath) + L"Line\n");
-		for (auto m : matches) {
-			print(fillString(m.first, longestPath) + std::to_wstring(m.second) + L"\n");
+			print(L"\n" + fillString(L"File", longestPath) + L"Line\n\n");
+			bool isWhite = false;
+			for (auto m : matches) {
+				isWhite = !isWhite;
+				setColor((isWhite ? Color::WHITE : Color::YELLOW));
+				print(fillString(m.first, longestPath) + std::to_wstring(m.second) + L"\n");
+			}
 		}
-
+		else {
+			print("No matches found\n");
+		}
 	}
 	catch (const std::exception& _e) {
 		print(m_prefix + L"Error: ");
