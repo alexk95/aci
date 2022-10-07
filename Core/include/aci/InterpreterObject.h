@@ -29,7 +29,6 @@ namespace aci {
 		void showInfo(void);
 
 		void printDelimiterLine(void);
-		void queueDelimiterLine(void);
 
 		// ################################################################################################################################
 
@@ -50,31 +49,17 @@ namespace aci {
 		void attachNotifier(AbstractInterpreterNotifier * _notifier) { m_notifier = _notifier; }
 
 		void disableInput(void);
-		void queueDisableInput(void);
 		void enableInput(void);
-		void queueEnableInput(void);
 
 		void print(const char * _message);
 		void print(const wchar_t * _message);
-		void queuePrint(const char * _message);
-		void queuePrint(const wchar_t * _message);
-
 		void print(bool _value);
-		void queuePrint(bool _value);
-
 		void print(const std::string& _message);
 		void print(const std::wstring& _message);
-		void queuePrint(const std::string& _message);
-		void queuePrint(const std::wstring& _message);
 
 		void setColor(int _r, int _g, int _b, int _a = 255);
-		void queueColor(int _r, int _g, int _b, int _a = 255);
-
 		void setColor(const Color& _color);
-		void queueColor(const Color& _color);
-
 		void setColor(Color::DefaultColor _color);
-		void queueColor(Color::DefaultColor _color);
 
 		// ################################################################################################################################
 
@@ -95,6 +80,7 @@ namespace aci {
 	protected:
 		virtual void showCommandInfo(void) = 0;
 
+	private:
 		InterpreterCore *				m_core;
 		AbstractPrinter *				m_printer;
 		AbstractInterpreterNotifier *	m_notifier;

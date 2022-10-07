@@ -28,6 +28,10 @@
 // Qt header
 #include <qevent.h>
 
+#include <thread>
+
+extern std::thread::id g_mainThreadId;
+
 using namespace ak;
 typedef aci::InterpreterObject ** (__stdcall *f_generateObjects)(int& _count);
 
@@ -157,32 +161,31 @@ bool AppBase::closeEvent(void) {
 }
 
 void AppBase::disableInput(void) {
-	setInputEnabled(false);
+	if (queueRequired()) QMetaObject::invokeMethod(this, "slotSetInputEnabled", Qt::QueuedConnection, Q_ARG(bool, false));
+	else slotSetInputEnabled(false);
 }
-void AppBase::disableInputAsync(void) {
-	QMetaObject::invokeMethod(this, "slotSetInputEnabled", Qt::QueuedConnection, Q_ARG(bool, false));
-}
+
 void AppBase::enableInput(void) {
-	setInputEnabled(true);
-}
-void AppBase::enableInputAsync(void) {
-	QMetaObject::invokeMethod(this, "slotSetInputEnabled", Qt::QueuedConnection, Q_ARG(bool, true));
+	if (queueRequired()) QMetaObject::invokeMethod(this, "slotSetInputEnabled", Qt::QueuedConnection, Q_ARG(bool, true));
+	else slotSetInputEnabled(true);
 }
 
 void AppBase::shutdown(void) {
 	m_mainWindow->close();
 }
 
-void AppBase::print(const std::string& _str) { slotPrintMessage(QString(_str.c_str())); }
-void AppBase::print(const std::wstring& _str) { slotPrintMessage(QString::fromWCharArray(_str.c_str())); }
-void AppBase::print(const QString& _str) { slotPrintMessage(_str); }
-void AppBase::printAsync(const std::string& _str) { QMetaObject::invokeMethod(this, "slotPrintMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString(_str.c_str()))); }
-void AppBase::printAsync(const std::wstring& _str) { QMetaObject::invokeMethod(this, "slotPrintMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString::fromWCharArray(_str.c_str()))); }
-void AppBase::printAsync(const QString& _str) { QMetaObject::invokeMethod(this, "slotPrintMessage", Qt::QueuedConnection, Q_ARG(const QString&, _str)); }
-void AppBase::setColor(const aci::Color& _color) { slotSetColor(QColor(_color.r(), _color.g(), _color.b(), _color.a())); }
-void AppBase::setColorAsync(const aci::Color& _color) { QMetaObject::invokeMethod(this, "slotSetColor", Qt::QueuedConnection, Q_ARG(const QColor&, QColor(_color.r(), _color.g(), _color.b(), _color.a()))); }
-void AppBase::setColor(const QColor& _color) { slotSetColor(_color); }
-void AppBase::setColorAsync(const QColor& _color) { QMetaObject::invokeMethod(this, "slotSetColor", Qt::QueuedConnection, Q_ARG(const QColor&, _color)); }
+void AppBase::print(const std::string& _str) { print(QString(_str.c_str())); }
+void AppBase::print(const std::wstring& _str) { print(QString::fromWCharArray(_str.c_str())); }
+void AppBase::print(const QString& _str) { 
+	if (queueRequired()) QMetaObject::invokeMethod(this, "slotPrintMessage", Qt::QueuedConnection, Q_ARG(const QString&, _str));
+	else slotPrintMessage(_str); 
+}
+
+void AppBase::setColor(const aci::Color& _color) { setColor(QColor(_color.r(), _color.g(), _color.b(), _color.a())); }
+void AppBase::setColor(const QColor& _color) { 
+	if (queueRequired()) QMetaObject::invokeMethod(this, "slotSetColor", Qt::QueuedConnection, Q_ARG(const QColor&, _color));
+	else slotSetColor(_color);
+}
 
 bool AppBase::fileExists(const std::wstring& _path) {
 	return QFile(QString::fromStdWString(_path)).exists();
@@ -332,17 +335,6 @@ void AppBase::loadScripts(void) {
 	//aci::API::core()->scriptLoader()->loadDllsFromDirectory(QString(qgetenv("ACI_DEFAULT_MERGE") + "\\x64\\Debug\\").toStdWString());
 }
 
-void AppBase::setInputEnabled(bool _isEnabled) {
-	m_in->setEnabled(_isEnabled);
-	if (_isEnabled) {
-		m_inLabel->setStyleSheet("#a_inputLabel{color: #40ff40;}");
-		m_in->setFocus();
-	}
-	else {
-		m_inLabel->setStyleSheet("#a_inputLabel{color: #ff4040;}");
-	}
-}
-
 // #########################################################################################
 
 // Slots
@@ -371,7 +363,14 @@ void AppBase::slotHandle(void) {
 }
 
 void AppBase::slotSetInputEnabled(bool _enabled) {
-	setInputEnabled(_enabled);
+	m_in->setEnabled(_enabled);
+	if (_enabled) {
+		m_inLabel->setStyleSheet("#a_inputLabel{color: #40ff40;}");
+		m_in->setFocus();
+	}
+	else {
+		m_inLabel->setStyleSheet("#a_inputLabel{color: #ff4040;}");
+	}
 }
 
 void AppBase::slotPrintMessage(const QString& _message) {
@@ -441,4 +440,12 @@ void AppBase::slotTabPressOnInput(void) {
 
 void AppBase::slotInputChanged(const QString& _text) {
 	m_lastCommand = _text;
+}
+
+// #########################################################################################
+
+// Private functions
+
+bool AppBase::queueRequired(void) {
+	return std::this_thread::get_id() != g_mainThreadId;
 }

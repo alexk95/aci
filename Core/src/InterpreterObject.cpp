@@ -31,12 +31,6 @@ void aci::InterpreterObject::printDelimiterLine(void) {
 	setColor(255, 255, 255);
 }
 
-void aci::InterpreterObject::queueDelimiterLine(void) {
-	queueColor(0, 255, 0);
-	queuePrint("####################################################################################################\n");
-	queueColor(255, 255, 255);
-}
-
 // ################################################################################################################################
 
 // File operations
@@ -72,13 +66,7 @@ bool aci::InterpreterObject::writeDataFile(const std::list<std::wstring>& _data,
 // Setter
 
 void aci::InterpreterObject::disableInput(void) {
-	if (m_notifier) {
-		m_notifier->disableInput();
-	}
-}
-
-void aci::InterpreterObject::queueDisableInput(void) {
-	if (m_notifier) { m_notifier->disableInputAsync(); }
+	if (m_notifier) m_notifier->disableInput();
 }
 
 void aci::InterpreterObject::enableInput(void) {
@@ -87,14 +75,8 @@ void aci::InterpreterObject::enableInput(void) {
 	}
 }
 
-void aci::InterpreterObject::queueEnableInput(void) {
-	if (m_notifier) { m_notifier->enableInputAsync(); }
-}
-
 void aci::InterpreterObject::print(const char * _message) { print(std::string(_message)); }
 void aci::InterpreterObject::print(const wchar_t * _message) { print(std::wstring(_message)); }
-void aci::InterpreterObject::queuePrint(const char * _message) { queuePrint(std::string(_message)); }
-void aci::InterpreterObject::queuePrint(const wchar_t * _message) { queuePrint(std::wstring(_message)); }
 
 void aci::InterpreterObject::print(bool _value) {
 	if (_value) {
@@ -108,18 +90,6 @@ void aci::InterpreterObject::print(bool _value) {
 		setColor(255, 255, 255);
 	}
 }
-void aci::InterpreterObject::queuePrint(bool _value) {
-	if (_value) {
-		queueColor(0, 255, 0);
-		queuePrint(L"TRUE");
-		queueColor(255, 255, 255);
-	}
-	else {
-		queueColor(255, 0, 0);
-		queuePrint(L"FALSE");
-		queueColor(255, 255, 255);
-	}
-}
 
 void aci::InterpreterObject::print(const std::string& _message) {
 	if (m_printer) { m_printer->print(_message); }
@@ -127,27 +97,14 @@ void aci::InterpreterObject::print(const std::string& _message) {
 void aci::InterpreterObject::print(const std::wstring& _message) {
 	if (m_printer) { m_printer->print(_message); }
 }
-void aci::InterpreterObject::queuePrint(const std::string& _message) {
-	if (m_printer) { m_printer->printAsync(_message); }
-}
-void aci::InterpreterObject::queuePrint(const std::wstring& _message) {
-	if (m_printer) { m_printer->printAsync(_message); }
-}
 
 void aci::InterpreterObject::setColor(int _r, int _g, int _b, int _a) {
 	setColor(Color(_r, _g, _b, _a));
 }
-void aci::InterpreterObject::queueColor(int _r, int _g, int _b, int _a) { queueColor(Color(_r, _g, _b, _a)); }
-
 void aci::InterpreterObject::setColor(const Color& _color) {
 	if (m_printer) { m_printer->setColor(_color); }
 }
-void aci::InterpreterObject::queueColor(const Color& _color) {
-	if (m_printer) { m_printer->setColorAsync(_color); }
-}
-
 void aci::InterpreterObject::setColor(Color::DefaultColor _color) { setColor(Color(_color)); }
-void aci::InterpreterObject::queueColor(Color::DefaultColor _color) { queueColor(Color(_color)); }
 
 // ################################################################################################################################
 

@@ -53,23 +53,16 @@ public:
 	virtual bool closeEvent(void) override;
 
 	virtual void disableInput(void) override;
-	virtual void disableInputAsync(void) override;
 	virtual void enableInput(void) override;
-	virtual void enableInputAsync(void) override;
 
 	virtual void shutdown(void) override;
 
 	virtual void print(const std::string& _str) override;
 	virtual void print(const std::wstring& _str) override;
 	void print(const QString& _str);
-	virtual void printAsync(const std::string& _str) override;
-	virtual void printAsync(const std::wstring& _str) override;
-	void printAsync(const QString& _str);
 
 	virtual void setColor(const aci::Color& _color) override;
-	virtual void setColorAsync(const aci::Color& _color) override;
 	void setColor(const QColor& _color);
-	void setColorAsync(const QColor& _color);
 
 	virtual bool fileExists(const std::wstring& _path) override;
 	virtual bool deleteFile(const std::wstring& _path) override;
@@ -97,8 +90,6 @@ public:
 
 	void loadScripts(void);
 
-	void setInputEnabled(bool _isEnabled);
-
 private slots:
 	void slotHandle(void);
 
@@ -116,6 +107,8 @@ private slots:
 
 private:
 	friend class TabToolbar;
+
+	bool queueRequired(void);
 
 	ak::UID					m_uid;			//! The UID of this class, used to create controls
 

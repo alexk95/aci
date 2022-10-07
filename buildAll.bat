@@ -31,4 +31,4 @@ CALL "%ACI_ROOT%\setupEnvironment.bat"
 
 REM Call build script
 
-CALL "%ACI_ROOT%\rebuildAll.bat" BOTH BUILD
+CALL "%ACI_ROOT%\rebuildAll.bat" BOTH BUILD %3

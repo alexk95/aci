@@ -785,10 +785,10 @@ void source::performRun(aci::aDir _dir, RunMode _mode) {
 
 		// Scan
 
-		queuePrint(m_prefix + L"Scanning: Directory\n");
+		print(m_prefix + L"Scanning: Directory\n");
 		_dir.scanAll();
 		
-		queuePrint(m_prefix + L"Directory information (no filter) loaded with:\n\t- Directories: " +
+		print(m_prefix + L"Directory information (no filter) loaded with:\n\t- Directories: " +
 			QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
 
 		// #########################################################################################################################
@@ -796,23 +796,23 @@ void source::performRun(aci::aDir _dir, RunMode _mode) {
 		// Apply filter
 
 		if (m_whiteListDActive) {
-			queuePrint(m_prefix + L"Applying filter: Directory: Whitelist\n");
+			print(m_prefix + L"Applying filter: Directory: Whitelist\n");
 			_dir.filterDirectoriesWithWhitelist(m_whiteListD);
 		}
 		if (m_blackListDActive) {
-			queuePrint(m_prefix + L"Applying filter: Directory: Blacklist\n");
+			print(m_prefix + L"Applying filter: Directory: Blacklist\n");
 			_dir.filterDirectoriesWithBlacklist(m_blackListD);
 		}
 		if (m_whiteListFActive) {
-			queuePrint(m_prefix + L"Applying filter: File: Whitelist\n");
+			print(m_prefix + L"Applying filter: File: Whitelist\n");
 			_dir.filterFilesWithWhitelist(m_whiteListF);
 		}
 		if (m_blackListFActive) {
-			queuePrint(m_prefix + L"Applying filter: File: Blacklist\n");
+			print(m_prefix + L"Applying filter: File: Blacklist\n");
 			_dir.filterFilesWithBlacklist(m_blackListF);
 		}
 
-		queuePrint(m_prefix + L"Directory information filtered with remaining:\n\t- Directories: " +
+		print(m_prefix + L"Directory information filtered with remaining:\n\t- Directories: " +
 			QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
 		
 		// #########################################################################################################################
@@ -829,34 +829,34 @@ void source::performRun(aci::aDir _dir, RunMode _mode) {
 
 			runScanFiles(_dir, files, lineCount, lineCountNotEmpty, lineCountCode, additionalInformation);
 
-			queuePrint("\n");
-			queueColor(Color::WHITE);
-			queuePrint(m_prefix + L"Files:                   ");
-			queueColor(Color::GREEN);
-			queuePrint(QString::number(files).toStdString() + "\n");
+			print("\n");
+			setColor(Color::WHITE);
+			print(m_prefix + L"Files:                   ");
+			setColor(Color::GREEN);
+			print(QString::number(files).toStdString() + "\n");
 
-			queueColor(Color::WHITE);
-			queuePrint(m_prefix + L"Lines of text:           ");
-			queueColor(Color::GREEN);
-			queuePrint(QString::number(lineCount).toStdString() + "\n");
+			setColor(Color::WHITE);
+			print(m_prefix + L"Lines of text:           ");
+			setColor(Color::GREEN);
+			print(QString::number(lineCount).toStdString() + "\n");
 
-			queueColor(Color::WHITE);
-			queuePrint(m_prefix + L"Not empty lines of text: ");
-			queueColor(Color::GREEN);
-			queuePrint(QString::number(lineCountNotEmpty).toStdString() + "\n");
+			setColor(Color::WHITE);
+			print(m_prefix + L"Not empty lines of text: ");
+			setColor(Color::GREEN);
+			print(QString::number(lineCountNotEmpty).toStdString() + "\n");
 
-			queueColor(Color::WHITE);
-			queuePrint(m_prefix + L"Lines of code:           ");
-			queueColor(Color::GREEN);
-			queuePrint(QString::number(lineCountCode).toStdString() + "\n\n");
+			setColor(Color::WHITE);
+			print(m_prefix + L"Lines of code:           ");
+			setColor(Color::GREEN);
+			print(QString::number(lineCountCode).toStdString() + "\n\n");
 
 			for (auto it : additionalInformation) {
-				queueColor(Color::WHITE);
-				queuePrint(m_prefix + it.first.toStdWString());
-				queueColor(Color::GREEN);
-				queuePrint(QString::number(it.second).toStdString() + "\n");
+				setColor(Color::WHITE);
+				print(m_prefix + it.first.toStdWString());
+				setColor(Color::GREEN);
+				print(QString::number(it.second).toStdString() + "\n");
 			}
-			queuePrint("\n");
+			print("\n");
 
 		}
 		else if (_mode == FILESONLY) {
@@ -867,8 +867,8 @@ void source::performRun(aci::aDir _dir, RunMode _mode) {
 		}
 	}
 	catch (const std::exception& _e) {
-		queuePrint(m_prefix + L"Error: ");
-		queuePrint(std::string(_e.what()) + "\n");
+		print(m_prefix + L"Error: ");
+		print(std::string(_e.what()) + "\n");
 		finishPerform();
 		return;
 	}
@@ -880,10 +880,10 @@ void source::performFind(aci::aDir _dir, const std::wstring& _text) {
 
 		// Scan
 
-		queuePrint(m_prefix + L"Scanning: Directory\n");
+		print(m_prefix + L"Scanning: Directory\n");
 		_dir.scanAll();
 
-		queuePrint(m_prefix + L"Directory information (no filter) loaded with:\n\t- Directories: " +
+		print(m_prefix + L"Directory information (no filter) loaded with:\n\t- Directories: " +
 			QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
 
 		// #########################################################################################################################
@@ -891,23 +891,23 @@ void source::performFind(aci::aDir _dir, const std::wstring& _text) {
 		// Apply filter
 
 		if (m_whiteListDActive) {
-			queuePrint(m_prefix + L"Applying filter: Directory: Whitelist\n");
+			print(m_prefix + L"Applying filter: Directory: Whitelist\n");
 			_dir.filterDirectoriesWithWhitelist(m_whiteListD);
 		}
 		if (m_blackListDActive) {
-			queuePrint(m_prefix + L"Applying filter: Directory: Blacklist\n");
+			print(m_prefix + L"Applying filter: Directory: Blacklist\n");
 			_dir.filterDirectoriesWithBlacklist(m_blackListD);
 		}
 		if (m_whiteListFActive) {
-			queuePrint(m_prefix + L"Applying filter: File: Whitelist\n");
+			print(m_prefix + L"Applying filter: File: Whitelist\n");
 			_dir.filterFilesWithWhitelist(m_whiteListF);
 		}
 		if (m_blackListFActive) {
-			queuePrint(m_prefix + L"Applying filter: File: Blacklist\n");
+			print(m_prefix + L"Applying filter: File: Blacklist\n");
 			_dir.filterFilesWithBlacklist(m_blackListF);
 		}
 
-		queuePrint(m_prefix + L"Directory information filtered with remaining:\n\t- Directories: " +
+		print(m_prefix + L"Directory information filtered with remaining:\n\t- Directories: " +
 			QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
 
 		// #########################################################################################################################
@@ -923,15 +923,15 @@ void source::performFind(aci::aDir _dir, const std::wstring& _text) {
 		}
 		longestPath += 4;
 
-		queuePrint(L"\n" + fillString(L"File", longestPath) + L"Line\n");
+		print(L"\n" + fillString(L"File", longestPath) + L"Line\n");
 		for (auto m : matches) {
-			queuePrint(fillString(m.first, longestPath) + std::to_wstring(m.second) + L"\n");
+			print(fillString(m.first, longestPath) + std::to_wstring(m.second) + L"\n");
 		}
 
 	}
 	catch (const std::exception& _e) {
-		queuePrint(m_prefix + L"Error: ");
-		queuePrint(std::string(_e.what()) + "\n");
+		print(m_prefix + L"Error: ");
+		print(std::string(_e.what()) + "\n");
 		finishPerform();
 		return;
 	}
@@ -940,20 +940,20 @@ void source::performFind(aci::aDir _dir, const std::wstring& _text) {
 
 void source::runScanDirectories(const std::wstring& _pathPrefix, const aci::aDir& _dir) {
 	for (auto dir : _dir.subdirectories()) {
-		queueColor(Color::WHITE);
-		queuePrint(m_prefix);
-		queueColor(Color::GREEN);
-		queuePrint(_pathPrefix + dir->name() + L"\n");
+		setColor(Color::WHITE);
+		print(m_prefix);
+		setColor(Color::GREEN);
+		print(_pathPrefix + dir->name() + L"\n");
 		runScanDirectories(_pathPrefix + dir->name() + L"/", *dir);
 	}
 }
 
 void source::runScanFilenames(const std::wstring& _pathPrefix, const aci::aDir& _dir) {
 	for (auto f : _dir.files()) {
-		queueColor(Color::WHITE);
-		queuePrint(m_prefix);
-		queueColor(Color::GREEN);
-		queuePrint(_pathPrefix + f->name() + L"\n");
+		setColor(Color::WHITE);
+		print(m_prefix);
+		setColor(Color::GREEN);
+		print(_pathPrefix + f->name() + L"\n");
 	}
 	for (auto dir : _dir.subdirectories()) {
 		runScanFilenames(_pathPrefix + dir->name() + L"/", *dir);
@@ -987,10 +987,10 @@ void source::runScanFiles(const aci::aDir& _dir, unsigned long long& _files, uns
 			actualFile.close();
 		}
 		else {
-			queueColor(Color::WHITE);
-			queuePrint(m_prefix);
-			queueColor(Color::RED);
-			queuePrint(L"Failed to open file for reading: " + file->fullPath() + L"\n");
+			setColor(Color::WHITE);
+			print(m_prefix);
+			setColor(Color::RED);
+			print(L"Failed to open file for reading: " + file->fullPath() + L"\n");
 		}
 	}
 
@@ -1071,10 +1071,10 @@ void source::findScanDirectory(const aci::aDir& _dir, const std::wstring& _short
 			actualFile.close();
 		}
 		else {
-			queueColor(Color::WHITE);
-			queuePrint(m_prefix);
-			queueColor(Color::RED);
-			queuePrint(L"Failed to open file for reading: " + f->fullPath() + L"\n");
+			setColor(Color::WHITE);
+			print(m_prefix);
+			setColor(Color::RED);
+			print(L"Failed to open file for reading: " + f->fullPath() + L"\n");
 		}
 	}
 
@@ -1085,9 +1085,9 @@ void source::findScanDirectory(const aci::aDir& _dir, const std::wstring& _short
 }
 
 void source::finishPerform() {
-	queueColor(Color::WHITE);
-	queuePrint(m_prefix + L"Done\n");
-	queueEnableInput();
+	setColor(Color::WHITE);
+	print(m_prefix + L"Done\n");
+	enableInput();
 }
 
 std::wstring source::fillString(const std::wstring& _original, size_t _length) {

@@ -677,10 +677,10 @@ bool merge::run(bool _diffOnly) {
 // Slots
 
 void merge::finishRun(bool _diffOnly) {
-	queueColor(Color::WHITE);
-	if (_diffOnly) { queuePrint(m_prefix + L"[diff]: Done\n"); }
-	else { queuePrint(m_prefix + L"[merge]: Done\n"); }
-	queueEnableInput();
+	setColor(Color::WHITE);
+	if (_diffOnly) { print(m_prefix + L"[diff]: Done\n"); }
+	else { print(m_prefix + L"[merge]: Done\n"); }
+	enableInput();
 }
 
 // #####################################################################################################
@@ -803,15 +803,15 @@ void merge::performRun(bool _diffOnly, aci::aDir _d1, aci::aDir _d2) {
 
 		// Scan
 
-		queuePrint(prefix + L"Scanning: Directory 1\n");
+		print(prefix + L"Scanning: Directory 1\n");
 		_d1.scanAll();
-		queuePrint(prefix + L"Scanning: Directory 2\n");
+		print(prefix + L"Scanning: Directory 2\n");
 		_d2.scanAll();
 
-		queuePrint(prefix + L"Directory 1 information (no filter) loaded with:\n\t- Directories: " +
+		print(prefix + L"Directory 1 information (no filter) loaded with:\n\t- Directories: " +
 			QString::number(_d1.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_d1.fileCount()).toStdWString() + L"\n");
 
-		queuePrint(prefix + L"Directory 2 information (no filter) loaded with:\n\t- Directories: " +
+		print(prefix + L"Directory 2 information (no filter) loaded with:\n\t- Directories: " +
 			QString::number(_d2.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_d2.fileCount()).toStdWString() + L"\n");
 
 		// #########################################################################################################################
@@ -819,92 +819,92 @@ void merge::performRun(bool _diffOnly, aci::aDir _d1, aci::aDir _d2) {
 		// Apply filter
 
 		if (m_whiteListDActive) {
-			queuePrint(prefix + L"Applying filter: Directory: Whitelist: Directory 1\n");
+			print(prefix + L"Applying filter: Directory: Whitelist: Directory 1\n");
 			_d1.filterDirectoriesWithWhitelist(m_whiteListD);
-			queuePrint(prefix + L"Applying filter: Directory: Whitelist: Directory 2\n");
+			print(prefix + L"Applying filter: Directory: Whitelist: Directory 2\n");
 			_d2.filterDirectoriesWithWhitelist(m_whiteListD);
 		}
 		if (m_blackListDActive) {
-			queuePrint(prefix + L"Applying filter: Directory: Blacklist: Directory 1\n");
+			print(prefix + L"Applying filter: Directory: Blacklist: Directory 1\n");
 			_d1.filterDirectoriesWithBlacklist(m_blackListD);
-			queuePrint(prefix + L"Applying filter: Directory: Blacklist: Directory 2\n");
+			print(prefix + L"Applying filter: Directory: Blacklist: Directory 2\n");
 			_d2.filterDirectoriesWithBlacklist(m_blackListD);
 		}
 		if (m_whiteListFActive) {
-			queuePrint(prefix + L"Applying filter: File: Whitelist: Directory 1\n");
+			print(prefix + L"Applying filter: File: Whitelist: Directory 1\n");
 			_d1.filterFilesWithWhitelist(m_whiteListF);
-			queuePrint(prefix + L"Applying filter: File: Whitelist: Directory 2\n");
+			print(prefix + L"Applying filter: File: Whitelist: Directory 2\n");
 			_d2.filterFilesWithWhitelist(m_whiteListF);
 		}
 		if (m_blackListFActive) {
-			queuePrint(prefix + L"Applying filter: File: Blacklist: Directory 1\n");
+			print(prefix + L"Applying filter: File: Blacklist: Directory 1\n");
 			_d1.filterFilesWithBlacklist(m_blackListF);
-			queuePrint(prefix + L"Applying filter: File: Blacklist: Directory 2\n");
+			print(prefix + L"Applying filter: File: Blacklist: Directory 2\n");
 			_d2.filterFilesWithBlacklist(m_blackListF);
 		}
 
-		queuePrint(prefix + L"Directory 1 information filtered with remaining:\n\t- Directories: " +
+		print(prefix + L"Directory 1 information filtered with remaining:\n\t- Directories: " +
 			QString::number(_d1.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_d1.fileCount()).toStdWString() + L"\n");
 		
-		queuePrint(prefix + L"Directory 2 information filtered with remaining:\n\t- Directories: " +
+		print(prefix + L"Directory 2 information filtered with remaining:\n\t- Directories: " +
 			QString::number(_d2.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_d2.fileCount()).toStdWString() + L"\n");
 
 		// #########################################################################################################################
 
 		// Check dirs
 
-		queuePrint(prefix + L"Check directories\n");
+		print(prefix + L"Check directories\n");
 		if (checkDirectories(_diffOnly, _d1, _d2, prefix) && (_diffOnly || !m_autoMerge)) {
-			queueColor(Color::ORANGE);
-			queuePrint(prefix + L"! > Execution stopped. Continue manually\n");
+			setColor(Color::ORANGE);
+			print(prefix + L"! > Execution stopped. Continue manually\n");
 			finishRun(_diffOnly);
 			return;
 		}
-		queueColor(Color::WHITE);
-		queuePrint(prefix + L"Check directories ");
-		queueColor(0, 255, 0);
-		queuePrint("NO DIFF\n");
-		queueColor(Color::WHITE);
+		setColor(Color::WHITE);
+		print(prefix + L"Check directories ");
+		setColor(0, 255, 0);
+		print("NO DIFF\n");
+		setColor(Color::WHITE);
 
 		// #########################################################################################################################
 
 		// Check files existance
 
-		queuePrint(prefix + L"Check files (existance)\n");
+		print(prefix + L"Check files (existance)\n");
 		if (checkFiles(_diffOnly, _d1, _d2, prefix) && (_diffOnly || !m_autoMerge)) {
-			queueColor(Color::ORANGE);
-			queuePrint(prefix + L"! > Execution stopped. Continue manually\n");
+			setColor(Color::ORANGE);
+			print(prefix + L"! > Execution stopped. Continue manually\n");
 			finishRun(_diffOnly);
 			return;
 		}
-		queueColor(Color::WHITE);
-		queuePrint(prefix + L"Check files (existance) ");
-		queueColor(0, 255, 0);
-		queuePrint("NO DIFF\n");
-		queueColor(Color::WHITE);
+		setColor(Color::WHITE);
+		print(prefix + L"Check files (existance) ");
+		setColor(0, 255, 0);
+		print("NO DIFF\n");
+		setColor(Color::WHITE);
 
 		// #########################################################################################################################
 
 		// Check file content
 
-		queuePrint(prefix + L"Check files (content)\n");
+		print(prefix + L"Check files (content)\n");
 		if (checkFileContent(_diffOnly, _d1, _d2, prefix)) {
-			queueColor(Color::WHITE);
-			queuePrint(prefix + L"Check files (content) ");
-			queueColor(0, 255, 0);
-			queuePrint("DONE\n");
-			queueColor(Color::WHITE);
+			setColor(Color::WHITE);
+			print(prefix + L"Check files (content) ");
+			setColor(0, 255, 0);
+			print("DONE\n");
+			setColor(Color::WHITE);
 		}
 		else {
-			queueColor(Color::WHITE);
-			queuePrint(prefix + L"Check files (content) ");
-			queueColor(0, 255, 0);
-			queuePrint("NO DIFF\n");
-			queueColor(Color::WHITE);
+			setColor(Color::WHITE);
+			print(prefix + L"Check files (content) ");
+			setColor(0, 255, 0);
+			print("NO DIFF\n");
+			setColor(Color::WHITE);
 		}
 	}
 	catch (const std::exception& _e) {
-		queuePrint(prefix + L"Check directories\n");
+		print(prefix + L"Check directories\n");
 		finishRun(_diffOnly);
 		
 	}
@@ -920,10 +920,10 @@ bool merge::checkDirectories(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, con
 
 	// ##### 1 > 2
 
-	queueColor(Color::ORANGE);
-	queuePrint(_logPrefix + L"##############################################################\n");
-	queueColor(Color::WHITE);
-	queuePrint(_logPrefix + L"     From: " + _d1.fullPath() + L"\n" +
+	setColor(Color::ORANGE);
+	print(_logPrefix + L"##############################################################\n");
+	setColor(Color::WHITE);
+	print(_logPrefix + L"     From: " + _d1.fullPath() + L"\n" +
 		_logPrefix + L"     To:   " + _d2.fullPath() + L"\n\n");
 
 	for (auto s1 : sub1) {
@@ -931,16 +931,16 @@ bool merge::checkDirectories(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, con
 		for (auto s2 : sub2) { if (s1 == s2) { found = true; break; } }
 		if (!found) {
 			if (_diffOnly) {
-				queueColor(Color::WHITE);
-				queuePrint(_logPrefix);
-				queueColor(Color::ORANGE);
-				queuePrint(L"Missing: " + s1 + L"\n");
+				setColor(Color::WHITE);
+				print(_logPrefix);
+				setColor(Color::ORANGE);
+				print(L"Missing: " + s1 + L"\n");
 			}
 			else {
-				queueColor(Color::WHITE);
-				queuePrint(_logPrefix);
-				queueColor(Color::ORANGE);
-				queuePrint(L"Creating: " + s1 + L"\n");
+				setColor(Color::WHITE);
+				print(_logPrefix);
+				setColor(Color::ORANGE);
+				print(L"Creating: " + s1 + L"\n");
 				QDir().mkdir(QString::fromStdWString(_d2.fullPath() + L"/" + s1));
 			}
 			ret = true;
@@ -949,10 +949,10 @@ bool merge::checkDirectories(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, con
 
 	// ##### 2 > 1
 
-	queueColor(Color::ORANGE);
-	queuePrint(_logPrefix + L"##############################################################\n");
-	queueColor(Color::WHITE);
-	queuePrint(_logPrefix + L"     From: " + _d2.fullPath() + L"\n" +
+	setColor(Color::ORANGE);
+	print(_logPrefix + L"##############################################################\n");
+	setColor(Color::WHITE);
+	print(_logPrefix + L"     From: " + _d2.fullPath() + L"\n" +
 		_logPrefix + L"     To:   " + _d1.fullPath() + L"\n\n");
 
 	for (auto s2 : sub2) {
@@ -960,21 +960,21 @@ bool merge::checkDirectories(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, con
 		for (auto s1 : sub1) { if (s1 == s2) { found = true; break; } }
 		if (!found) {
 			if (_diffOnly) {
-				queueColor(Color::WHITE);
-				queuePrint(_logPrefix);
-				queueColor(Color::ORANGE);
-				queuePrint(L"Missing: " + s2 + L"\n");
+				setColor(Color::WHITE);
+				print(_logPrefix);
+				setColor(Color::ORANGE);
+				print(L"Missing: " + s2 + L"\n");
 			}
 			else {
-				queueColor(Color::WHITE);
-				queuePrint(_logPrefix);
-				queueColor(Color::ORANGE);
-				queuePrint(L"Creating: " + s2 + L"\n");
+				setColor(Color::WHITE);
+				print(_logPrefix);
+				setColor(Color::ORANGE);
+				print(L"Creating: " + s2 + L"\n");
 				if (!QDir().mkdir(QString::fromStdWString(_d1.fullPath() + L"/" + s2))) {
-					queueColor(Color::WHITE);
-					queuePrint(_logPrefix);
-					queueColor(Color::RED);
-					queuePrint(L"Failed to create directory (Auto merge disabled now)\n");
+					setColor(Color::WHITE);
+					print(_logPrefix);
+					setColor(Color::RED);
+					print(L"Failed to create directory (Auto merge disabled now)\n");
 					m_autoMerge = false;
 					return true;
 				}
@@ -995,38 +995,38 @@ bool merge::checkFiles(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, const std
 
 	// ##### 1 > 2
 
-	queueColor(Color::WHITE);
-	queuePrint(_logPrefix);
-	queueColor(Color::ORANGE);
-	queuePrint(L"##############################################################\n");
-	queueColor(Color::WHITE);
-	queuePrint(_logPrefix);
-	queuePrint(L"     From: " + _d1.fullPath() + L"\n");
-	queuePrint(_logPrefix);
-	queuePrint(L"     To:   " + _d2.fullPath() + L"\n\n");
+	setColor(Color::WHITE);
+	print(_logPrefix);
+	setColor(Color::ORANGE);
+	print(L"##############################################################\n");
+	setColor(Color::WHITE);
+	print(_logPrefix);
+	print(L"     From: " + _d1.fullPath() + L"\n");
+	print(_logPrefix);
+	print(L"     To:   " + _d2.fullPath() + L"\n\n");
 
 	for (auto s1 : files1) {
 		bool found{ false };
 		for (auto s2 : files2) { if (s1 == s2) { found = true; break; } }
 		if (!found) {
 			if (_diffOnly) {
-				queueColor(Color::WHITE);
-				queuePrint(_logPrefix);
-				queueColor(Color::ORANGE);
-				queuePrint(L"Missing: " + s1 + L"\n");
+				setColor(Color::WHITE);
+				print(_logPrefix);
+				setColor(Color::ORANGE);
+				print(L"Missing: " + s1 + L"\n");
 			}
 			else {
-				queueColor(Color::WHITE);
-				queuePrint(_logPrefix);
-				queueColor(Color::ORANGE);
-				queuePrint(L"Creating: " + s1 + L"\n");
+				setColor(Color::WHITE);
+				print(_logPrefix);
+				setColor(Color::ORANGE);
+				print(L"Creating: " + s1 + L"\n");
 
 				QFile file(QString::fromStdWString(_d1.fullPath() + L"/" + s1));
 				if (!file.copy(QString::fromStdWString(_d2.fullPath() + L"/" + s1))) {
-					queueColor(Color::WHITE);
-					queuePrint(_logPrefix);
-					queueColor(Color::RED);
-					queuePrint(L"Failed to copy file (Auto merge disabled now)\n");
+					setColor(Color::WHITE);
+					print(_logPrefix);
+					setColor(Color::RED);
+					print(L"Failed to copy file (Auto merge disabled now)\n");
 					m_autoMerge = false;
 					return true;
 				}
@@ -1037,38 +1037,38 @@ bool merge::checkFiles(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, const std
 
 	// ##### 2 > 1
 
-	queueColor(Color::WHITE);
-	queuePrint(_logPrefix);
-	queueColor(Color::ORANGE);
-	queuePrint(L"##############################################################\n");
-	queueColor(Color::WHITE);
-	queuePrint(_logPrefix);
-	queuePrint(L"     From: " + _d2.fullPath() + L"\n");
-	queuePrint(_logPrefix);
-	queuePrint(L"     To:   " + _d1.fullPath() + L"\n\n");
+	setColor(Color::WHITE);
+	print(_logPrefix);
+	setColor(Color::ORANGE);
+	print(L"##############################################################\n");
+	setColor(Color::WHITE);
+	print(_logPrefix);
+	print(L"     From: " + _d2.fullPath() + L"\n");
+	print(_logPrefix);
+	print(L"     To:   " + _d1.fullPath() + L"\n\n");
 
 	for (auto s2 : files2) {
 		bool found{ false };
 		for (auto s1 : files1) { if (s1 == s2) { found = true; break; } }
 		if (!found) {
 			if (_diffOnly) {
-				queueColor(Color::WHITE);
-				queuePrint(_logPrefix);
-				queueColor(Color::ORANGE);
-				queuePrint(L"Missing: " + s2 + L"\n");
+				setColor(Color::WHITE);
+				print(_logPrefix);
+				setColor(Color::ORANGE);
+				print(L"Missing: " + s2 + L"\n");
 			}
 			else {
-				queueColor(Color::WHITE);
-				queuePrint(_logPrefix);
-				queueColor(Color::ORANGE);
-				queuePrint(L"Creating: " + s2 + L"\n");
+				setColor(Color::WHITE);
+				print(_logPrefix);
+				setColor(Color::ORANGE);
+				print(L"Creating: " + s2 + L"\n");
 
 				QFile file(QString::fromStdWString(_d2.fullPath() + L"/" + s2));
 				if (!file.copy(QString::fromStdWString(_d1.fullPath() + L"/" + s2))) {
-					queueColor(Color::WHITE);
-					queuePrint(_logPrefix);
-					queueColor(Color::RED);
-					queuePrint(L"Failed to copy file (Auto merge disabled now)\n");
+					setColor(Color::WHITE);
+					print(_logPrefix);
+					setColor(Color::RED);
+					print(L"Failed to copy file (Auto merge disabled now)\n");
 					m_autoMerge = false;
 					return true;
 				}
@@ -1097,31 +1097,31 @@ bool merge::checkFileContent(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, con
 
 	// ##### 1 > 2
 
-	queueColor(Color::WHITE);
-	queuePrint(_logPrefix);
-	queueColor(Color::ORANGE);
-	queuePrint(L"##############################################################\n");
-	queueColor(Color::WHITE);
-	queuePrint(_logPrefix);
-	queuePrint(_d1.fullPath() + L"\n");
-	queuePrint(_logPrefix);
-	queuePrint(spacer + _d2.fullPath() + L"\n");
+	setColor(Color::WHITE);
+	print(_logPrefix);
+	setColor(Color::ORANGE);
+	print(L"##############################################################\n");
+	setColor(Color::WHITE);
+	print(_logPrefix);
+	print(_d1.fullPath() + L"\n");
+	print(_logPrefix);
+	print(spacer + _d2.fullPath() + L"\n");
 
 	for (auto f1 : files1) {
 		// File 1
 		QFile file1(QString::fromStdWString(_d1.fullPath() + L"/" + f1));
 		if (!file1.exists()) {
-			queueColor(Color::WHITE);
-			queuePrint(_logPrefix);
-			queueColor(Color::RED);
-			queuePrint(L"File does not exist (" + _d1.fullPath() + L"/" + f1 + L")\n");
+			setColor(Color::WHITE);
+			print(_logPrefix);
+			setColor(Color::RED);
+			print(L"File does not exist (" + _d1.fullPath() + L"/" + f1 + L")\n");
 			return true;
 		}
 		if (!file1.open(QIODevice::ReadOnly)) {
-			queueColor(Color::WHITE);
-			queuePrint(_logPrefix);
-			queueColor(Color::RED);
-			queuePrint(L"Failed to open file for reading (" + _d1.fullPath() + L"/" + f1 + L")\n");
+			setColor(Color::WHITE);
+			print(_logPrefix);
+			setColor(Color::RED);
+			print(L"Failed to open file for reading (" + _d1.fullPath() + L"/" + f1 + L")\n");
 			return true;
 		}
 
@@ -1131,17 +1131,17 @@ bool merge::checkFileContent(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, con
 		// File 2
 		QFile file2(QString::fromStdWString(_d2.fullPath() + L"/" + f1));
 		if (!file2.exists()) {
-			queueColor(Color::WHITE);
-			queuePrint(_logPrefix);
-			queueColor(Color::RED);
-			queuePrint(L"File does not exist (" + _d2.fullPath() + L"/" + f1 + L")\n");
+			setColor(Color::WHITE);
+			print(_logPrefix);
+			setColor(Color::RED);
+			print(L"File does not exist (" + _d2.fullPath() + L"/" + f1 + L")\n");
 			return true;
 		}
 		if (!file2.open(QIODevice::ReadOnly)) {
-			queueColor(Color::WHITE);
-			queuePrint(_logPrefix);
-			queueColor(Color::RED);
-			queuePrint(L"Failed to open file for reading (" + _d2.fullPath() + L"/" + f1 + L")\n");
+			setColor(Color::WHITE);
+			print(_logPrefix);
+			setColor(Color::RED);
+			print(L"Failed to open file for reading (" + _d2.fullPath() + L"/" + f1 + L")\n");
 			return true;
 		}
 
@@ -1154,77 +1154,77 @@ bool merge::checkFileContent(bool _diffOnly, aci::aDir& _d1, aci::aDir& _d2, con
 			QFileInfo info2(file2);
 			if (info1.lastModified() > info2.lastModified()) {
 				if (_diffOnly) {
-					queueColor(Color::WHITE);
-					queuePrint(_logPrefix);
-					queueColor(Color::GREEN);
-					queuePrint(f1 + L" [NEWER]\n");
+					setColor(Color::WHITE);
+					print(_logPrefix);
+					setColor(Color::GREEN);
+					print(f1 + L" [NEWER]\n");
 				}
 				else {
 					// Delete old file
 					if (!file2.remove()) {
-						queueColor(Color::WHITE);
-						queuePrint(_logPrefix);
-						queueColor(Color::RED);
-						queuePrint(L"Failed to delete outdated file (" + _d2.fullPath() + L"/" + f1 + L")\n");
+						setColor(Color::WHITE);
+						print(_logPrefix);
+						setColor(Color::RED);
+						print(L"Failed to delete outdated file (" + _d2.fullPath() + L"/" + f1 + L")\n");
 						return true;
 					}
 
 					// Copy newer file
 					if (!file1.copy(QString::fromStdWString(_d2.fullPath() + L"/" + f1))) {
-						queueColor(Color::WHITE);
-						queuePrint(_logPrefix);
-						queueColor(Color::RED);
-						queuePrint(L"Failed to copy file (" + _d1.fullPath() + L"/" + f1 + L"  ->  " + _d2.fullPath() + L"/" + f1 + L")\n");
+						setColor(Color::WHITE);
+						print(_logPrefix);
+						setColor(Color::RED);
+						print(L"Failed to copy file (" + _d1.fullPath() + L"/" + f1 + L"  ->  " + _d2.fullPath() + L"/" + f1 + L")\n");
 						return true;
 					}
 
-					queueColor(Color::WHITE);
-					queuePrint(_logPrefix);
-					queueColor(Color::GREEN);
-					queuePrint(spacer + _d2.fullPath() + L"/" + f1 + L" [UPDATED]\n");
+					setColor(Color::WHITE);
+					print(_logPrefix);
+					setColor(Color::GREEN);
+					print(spacer + _d2.fullPath() + L"/" + f1 + L" [UPDATED]\n");
 				}
 			}
 			else if (info1.lastModified() < info2.lastModified()) {
 				if (_diffOnly) {
-					queueColor(Color::WHITE);
-					queuePrint(_logPrefix);
-					queueColor(Color::GREEN);
-					queuePrint(spacer + f1 + L" [NEWER]\n");
+					setColor(Color::WHITE);
+					print(_logPrefix);
+					setColor(Color::GREEN);
+					print(spacer + f1 + L" [NEWER]\n");
 				}
 				else {
 					// Delete old file
 					if (!file1.remove()) {
-						queueColor(Color::WHITE);
-						queuePrint(_logPrefix);
-						queueColor(Color::RED);
-						queuePrint(L"Failed to delete outdated file (" + _d1.fullPath() + L"/" + f1 + L")\n");
+						setColor(Color::WHITE);
+						print(_logPrefix);
+						setColor(Color::RED);
+						print(L"Failed to delete outdated file (" + _d1.fullPath() + L"/" + f1 + L")\n");
 						return true;
 					}
 
 					// Copy newer file
 					if (!file2.copy(QString::fromStdWString(_d1.fullPath() + L"/" + f1))) {
-						queueColor(Color::WHITE);
-						queuePrint(_logPrefix);
-						queueColor(Color::RED);
-						queuePrint(L"Failed to copy file (" + _d2.fullPath() + L"/" + f1 + L"  ->  " + _d1.fullPath() + L"/" + f1 + L")\n");
+						setColor(Color::WHITE);
+						print(_logPrefix);
+						setColor(Color::RED);
+						print(L"Failed to copy file (" + _d2.fullPath() + L"/" + f1 + L"  ->  " + _d1.fullPath() + L"/" + f1 + L")\n");
 						return true;
 					}
 					
-					queueColor(Color::WHITE);
-					queuePrint(_logPrefix);
-					queueColor(Color::GREEN);
-					queuePrint(_d1.fullPath() + L"/" + f1 + L" [UPDATED]\n");
+					setColor(Color::WHITE);
+					print(_logPrefix);
+					setColor(Color::GREEN);
+					print(_d1.fullPath() + L"/" + f1 + L" [UPDATED]\n");
 				}
 			}
 			else {
-				queueColor(Color::WHITE);
-				queuePrint(_logPrefix);
-				queueColor(Color::RED);
-				queuePrint(L"Can not merge \"" + f1 + L"\"\n");
-				queueColor(Color::WHITE);
-				queuePrint(_logPrefix);
-				queueColor(Color::RED);
-				queuePrint(L"        ^-- Files differ with same last modified value\n");
+				setColor(Color::WHITE);
+				print(_logPrefix);
+				setColor(Color::RED);
+				print(L"Can not merge \"" + f1 + L"\"\n");
+				setColor(Color::WHITE);
+				print(_logPrefix);
+				setColor(Color::RED);
+				print(L"        ^-- Files differ with same last modified value\n");
 				if (!_diffOnly) { return true; }
 			}
 			ret = true;
