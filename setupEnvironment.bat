@@ -39,6 +39,7 @@ SET ACI_DEFAULT_MERGE=%ACI_ROOT%\DefaultScripts\merge
 SET ACI_DEFAULT_ODBC=%ACI_ROOT%\DefaultScripts\odbc
 SET ACI_DEFAULT_DEFAULT=%ACI_ROOT%\DefaultScripts\default
 SET ACI_DEFAULT_SOURCE=%ACI_ROOT%\DefaultScripts\source
+SET ACI_DEFAULT_CLEANTEXT=%ACI_ROOT%\DefaultScripts\cleantext
 
 REM Setup UI Core env
 CALL "%UI_CORE_ROOT%\setupEnvironment.bat"

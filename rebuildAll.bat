@@ -103,6 +103,11 @@ ECHO Build Library: Script: source
 ECHO ===============================================================
 CALL "%ACI_DEFAULT_SOURCE%\build.bat" %1 %2
 
+ECHO ===============================================================
+ECHO Build Library: Script: cleantext
+ECHO ===============================================================
+CALL "%ACI_DEFAULT_CLEANTEXT%\build.bat" %1 %2
+
 if "%3"=="SKIP" (
 	ECHO Skipping build log summary
 	goto END
