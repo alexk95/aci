@@ -46,14 +46,17 @@ public:
 
 	bool find(const std::wstring& _text);
 
+	bool cleanTab(int _tabLength);
+
 protected:
 	virtual void showCommandInfo(void) override;
 
 private:
-
 	void performRun(aci::aDir _dir, RunMode _mode);
 
 	void performFind(aci::aDir _dir, const std::wstring& _text);
+
+	void performCleanTab(aci::aDir _dir, int _tabLength);
 
 	void runScanDirectories(const std::wstring& _pathPrefix, const aci::aDir& _dir);
 
@@ -65,9 +68,15 @@ private:
 
 	void runLineHasKey(const QString& _line, const QString& _key, const QString& _keyName, std::map<QString, unsigned long long>& _informationMap);
 
+	void runCleanTab(const aci::aDir& _dir, int _tabLength);
+
+	void runCleanTab(const aci::aFile& _file, int _tabLength);
+
 	void findScanDirectory(const aci::aDir& _dir, const std::wstring& _shortPath, const QString& _textToFind, std::list<std::pair<std::wstring, unsigned long long>>& _matches);
 
 	void finishPerform();
+
+	void scanAndTidyDir(aci::aDir& _dir);
 
 	static std::wstring fillString(const std::wstring& _original, size_t _length);
 

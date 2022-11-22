@@ -1,6 +1,7 @@
 #include "source.h"
 #include <aci/aFile.h>
 #include <aci/Color.h>
+#include <aci/Convert.h>
 #include <AdditionalOperators.h>
 
 #include <qjsondocument.h>
@@ -28,8 +29,9 @@ bool source::handle(const std::wstring& _command, const std::vector<std::wstring
 		if (_params.back() == L"cfg") { cmdConfiguration(); return true; }
 		else if (_params.back() == L"clear") { cmdClear(); return true; }
 		else if (_params.back() == L"run") { return run(ALL); }	
-		else if (_params.back() == L"dir" || _params.back() == L"directory") { return run(DIRSONLY); }
-		else if (_params.back() == L"file") { return run(FILESONLY); }
+		else if (_params.back() == L"dir" || _params.back() == L"dirs" || _params.back() == L"directory") { return run(DIRSONLY); }
+		else if (_params.back() == L"file" || _params.back() == L"files") { return run(FILESONLY); }
+		else if (_params.back() == L"cleantab") { return cleanTab(5); }
 		else {
 			setColor(Color::RED);
 			print(m_prefix + L"Invalid arguments for \"source\". Try \"?source\" for help\n");
@@ -225,6 +227,15 @@ bool source::handle(const std::wstring& _command, const std::vector<std::wstring
 		}
 		else if (_params[1] == L"find") {
 			return find(_params[2]);
+		}
+		else if (_params[1] == L"cleantab") {
+			int tabLength = 0;
+			if (!aci::toNumber(_params[2], tabLength)) {
+				setColor(Color::RED);
+				print(m_prefix + L"Invalid number format for \"cleantab <tab length>\"\n");
+				return false;
+			}
+			return cleanTab(tabLength);
 		}
 	}
 
@@ -612,7 +623,6 @@ void source::showSavedConfigs(void) {
 // #####################################################################################################
 
 bool source::run(RunMode _mode) {
-
 	if (m_path.empty()) {
 		setColor(Color::WHITE);
 		print(m_prefix);
@@ -666,6 +676,33 @@ bool source::find(const std::wstring& _text) {
 	return true;
 }
 
+bool source::cleanTab(int _tabLength) {
+	if (m_path.empty()) {
+		setColor(Color::WHITE);
+		print(m_prefix);
+		setColor(Color::RED);
+		print(L"Directory is empty\n");
+		return false;
+	}
+
+	// Check the directories
+	aci::aDir dir(L"", m_path);
+
+	if (!dir.exists()) {
+		setColor(Color::WHITE);
+		print(m_prefix);
+		setColor(Color::RED);
+		print(L"The directory \"" + m_path + L"\" does not exist\n");
+		return false;
+	}
+
+	disableInput();
+
+	std::thread t1(&source::performCleanTab, this, dir, _tabLength);
+	t1.detach();
+	return true;
+}
+
 // #####################################################################################################
 
 // Protected functions
@@ -677,48 +714,48 @@ void source::showCommandInfo(void) {
 	print(m_prefix + L"?   - number of files\n");
 
 	print(m_prefix + L"\t");
-	print(L"cfg               Show the current configuration\n");
+	print(L"cfg                    Show the current configuration\n");
 
 	setColor(Color::WHITE);
 	print(m_prefix + L"\t");
 	setColor(Color::YELLOW);
-	print(L"top <active>      Will activate/disable the top level only option ( true / false / 0 / 1 )\n");
+	print(L"top <active>           Will activate/disable the top level only option ( true / false / 0 / 1 )\n");
 	setColor(Color::WHITE);
 
 	print(m_prefix + L"\t");
-	print(L"lang <language>   Will set the programming language (supported: c++)\n");
+	print(L"lang <language>        Will set the programming language (supported: c++)\n");
 
 	print(m_prefix + L"\t");
 	setColor(Color::YELLOW);
-	print(L"load              Show all saved configurations\n");
+	print(L"load                   Show all saved configurations\n");
 	setColor(Color::WHITE);
 
 	print(m_prefix + L"\t");
-	print(L"save              Show all saved configurations\n");
+	print(L"save                   Show all saved configurations\n");
 
 	print(m_prefix + L"\t");
 	setColor(Color::YELLOW);
-	print(L"run               Will start the source information gathering process with the current configuration\n");
+	print(L"run                    Will start the source information gathering process with the current configuration\n");
 	setColor(Color::WHITE);
 
 	print(m_prefix + L"\t");
-	print(L"dir               Will display all directories that match the current configuration\n");
+	print(L"dir                    Will display all directories that match the current configuration\n");
 
 	print(m_prefix + L"\t");
 	setColor(Color::YELLOW);
-	print(L"file              Will display all files that match the current configuration\n");
+	print(L"file                   Will display all files that match the current configuration\n");
 	setColor(Color::WHITE);
 
 	print(m_prefix + L"\t");
-	print(L"dir <path>        Set directory\n");
+	print(L"dir <path>             Set directory\n");
 
 	print(m_prefix + L"\t");
 	setColor(Color::YELLOW);
-	print(L"files             Will display all files with the current configuration\n");
+	print(L"files                  Will display all files with the current configuration\n");
 	setColor(Color::WHITE);
 
 	print(m_prefix + L"\t");
-	print(L"load <filename>   Will load the configuration from the file specified\n"
+	print(L"load <filename>        Will load the configuration from the file specified\n"
 		"\t                       (");
 	setColor(Color::ORANGE);
 	print(L"\"../ScriptData/source/Configurations");
@@ -730,7 +767,7 @@ void source::showCommandInfo(void) {
 
 	print(m_prefix + L"\t");
 	setColor(Color::YELLOW);
-	print(L"save <filename>   Will save the configuration to the file specified\n"
+	print(L"save <filename>        Will save the configuration to the file specified\n"
 		"\t                       (");
 	setColor(Color::ORANGE);
 	print(L"\"../ScriptData/source/Configurations");
@@ -741,39 +778,47 @@ void source::showCommandInfo(void) {
 	setColor(Color::WHITE);
 
 	print(m_prefix + L"\t");
-	print(L"wd <active>       Will activate/disable the whitelist for directories ( true / false / 0 / 1 )\n");
+	print(L"wd <active>            Will activate/disable the whitelist for directories ( true / false / 0 / 1 )\n");
 	
 	print(m_prefix + L"\t");
 	setColor(Color::YELLOW);
-	print(L"+wd <filter>      Will add the provided filter to the directories whitelist\n");
+	print(L"+wd <filter>           Will add the provided filter to the directories whitelist\n");
 	setColor(Color::WHITE);
 	
 	print(m_prefix + L"\t");
-	print(L"-wd <filter>      Will remove the provided filter from the directories whitelist\n");
+	print(L"-wd <filter>           Will remove the provided filter from the directories whitelist\n");
 	
 	print(m_prefix + L"\t");
 	setColor(Color::YELLOW);
-	print(L"-wd *             Will clear the directories whitelist\n");
-	setColor(Color::WHITE);
-
-	print(m_prefix + L"\t");
-	print(L"bd <active>       Will activate/disable the blacklist for directories ( true / false / 0 / 1 )\n");
-	
-	print(m_prefix + L"\t");
-	setColor(Color::YELLOW);
-	print(L"+bd <filter>      Will add the provided filter to the directories blacklist\n");
-	setColor(Color::WHITE);
-	
-	print(m_prefix + L"\t");
-	print(L"-bd <filter>      Will remove the provided filter from directories the blacklist\n");
-
-	print(m_prefix + L"\t");
-	setColor(Color::YELLOW);
-	print(L"-bd *             Will clear the directories blacklist\n");
+	print(L"-wd *                  Will clear the directories whitelist\n");
 	setColor(Color::WHITE);
 
 	print(m_prefix + L"\t");
-	print(L"find <text>       Will scan all files and display the files that contain the given text\n");
+	print(L"bd <active>            Will activate/disable the blacklist for directories ( true / false / 0 / 1 )\n");
+	
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"+bd <filter>           Will add the provided filter to the directories blacklist\n");
+	setColor(Color::WHITE);
+	
+	print(m_prefix + L"\t");
+	print(L"-bd <filter>           Will remove the provided filter from directories the blacklist\n");
+
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"-bd *                  Will clear the directories blacklist\n");
+	setColor(Color::WHITE);
+
+	print(m_prefix + L"\t");
+	print(L"find <text>            Will scan all files and display the files that contain the given text\n");
+
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"cleantab <tab length>  Will replace tabulators with spaces in the files.\n");
+	setColor(Color::WHITE);
+	print(m_prefix + L"\t");
+	setColor(Color::YELLOW);
+	print(L"                       Optional: Tab length: The ammount of spaces that are in one tab. Default 4\n");
 }
 
 // #####################################################################################################
@@ -782,38 +827,7 @@ void source::showCommandInfo(void) {
 
 void source::performRun(aci::aDir _dir, RunMode _mode) {
 	try {
-
-		// Scan
-
-		print(m_prefix + L"Scanning: Directory\n");
-		_dir.scanAll();
-		
-		print(m_prefix + L"Directory information (no filter) loaded with:\n\t- Directories: " +
-			QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
-
-		// #########################################################################################################################
-
-		// Apply filter
-
-		if (m_whiteListDActive) {
-			print(m_prefix + L"Applying filter: Directory: Whitelist\n");
-			_dir.filterDirectoriesWithWhitelist(m_whiteListD);
-		}
-		if (m_blackListDActive) {
-			print(m_prefix + L"Applying filter: Directory: Blacklist\n");
-			_dir.filterDirectoriesWithBlacklist(m_blackListD);
-		}
-		if (m_whiteListFActive) {
-			print(m_prefix + L"Applying filter: File: Whitelist\n");
-			_dir.filterFilesWithWhitelist(m_whiteListF);
-		}
-		if (m_blackListFActive) {
-			print(m_prefix + L"Applying filter: File: Blacklist\n");
-			_dir.filterFilesWithBlacklist(m_blackListF);
-		}
-
-		print(m_prefix + L"Directory information filtered with remaining:\n\t- Directories: " +
-			QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
+		scanAndTidyDir(_dir);
 		
 		// #########################################################################################################################
 
@@ -877,38 +891,7 @@ void source::performRun(aci::aDir _dir, RunMode _mode) {
 
 void source::performFind(aci::aDir _dir, const std::wstring& _text) {
 	try {
-
-		// Scan
-
-		print(m_prefix + L"Scanning: Directory\n");
-		_dir.scanAll();
-
-		print(m_prefix + L"Directory information (no filter) loaded with:\n\t- Directories: " +
-			QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
-
-		// #########################################################################################################################
-
-		// Apply filter
-
-		if (m_whiteListDActive) {
-			print(m_prefix + L"Applying filter: Directory: Whitelist\n");
-			_dir.filterDirectoriesWithWhitelist(m_whiteListD);
-		}
-		if (m_blackListDActive) {
-			print(m_prefix + L"Applying filter: Directory: Blacklist\n");
-			_dir.filterDirectoriesWithBlacklist(m_blackListD);
-		}
-		if (m_whiteListFActive) {
-			print(m_prefix + L"Applying filter: File: Whitelist\n");
-			_dir.filterFilesWithWhitelist(m_whiteListF);
-		}
-		if (m_blackListFActive) {
-			print(m_prefix + L"Applying filter: File: Blacklist\n");
-			_dir.filterFilesWithBlacklist(m_blackListF);
-		}
-
-		print(m_prefix + L"Directory information filtered with remaining:\n\t- Directories: " +
-			QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
+		scanAndTidyDir(_dir);
 
 		// #########################################################################################################################
 
@@ -935,6 +918,22 @@ void source::performFind(aci::aDir _dir, const std::wstring& _text) {
 		else {
 			print("No matches found\n");
 		}
+	}
+	catch (const std::exception& _e) {
+		print(m_prefix + L"Error: ");
+		print(std::string(_e.what()) + "\n");
+		finishPerform();
+		return;
+	}
+	finishPerform();
+}
+
+void source::performCleanTab(aci::aDir _dir, int _tabLength) {
+	try {
+		scanAndTidyDir(_dir);
+
+		for (auto d : _dir.subdirectories()) runCleanTab(*d, _tabLength);
+		for (auto f : _dir.files()) runCleanTab(*f, _tabLength);
 	}
 	catch (const std::exception& _e) {
 		print(m_prefix + L"Error: ");
@@ -1059,6 +1058,72 @@ void source::runLineHasKey(const QString& _line, const QString& _key, const QStr
 	}
 }
 
+void source::runCleanTab(const aci::aDir& _dir, int _tabLength) {
+	for (aci::aDir * d : _dir.subdirectories()) runCleanTab(*d, _tabLength);
+	for (aci::aFile * f : _dir.files()) runCleanTab(*f, _tabLength);
+}
+
+void source::runCleanTab(const aci::aFile& _file, int _tabLength) {
+	QFile f(QString::fromStdWString(_file.fullPath()));
+	if (!f.exists()) return;
+
+	if (!f.open(QIODevice::ReadOnly)) {
+		setColor(Color::WHITE);
+		print(m_prefix);
+		setColor(Color::RED);
+		print(L"Failed to open file for reading: " + _file.fullPath() + L"\n");
+		return;
+	}
+
+	// Read file
+	QByteArray data = f.readAll();
+	f.close();
+
+	// Prepare final
+	QByteArray finalData;
+	finalData.reserve(data.size());
+
+	// Check for tabs
+	int column = 0;
+	int replaced = 0;
+	for (int i = 0; i < data.count(); i++) {
+		if (data[i] == '\t') {
+			finalData.push_back(' ');
+			column++;
+			replaced++;
+			while (column % _tabLength) {
+				finalData.push_back(' ');
+				column++;
+			}
+		}
+		else {
+			if (data[i] == '\n' || data[i] == '\r') column = 0;
+			else column++;
+
+			finalData.push_back(data[i]);
+		}
+	}
+
+	// Check if the original file needs to be updated
+	if (replaced > 0) {
+		if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+			setColor(Color::WHITE);
+			print(m_prefix);
+			setColor(Color::RED);
+			print(L"Failed to open file for writing: " + _file.fullPath() + L"\n");
+			return;
+		}
+
+		f.write(finalData);
+		f.close();
+
+		setColor(Color::WHITE);
+		print(m_prefix);
+		setColor(Color::GREEN);
+		print(L"Replaced " + std::to_wstring(replaced) + L" tabs: " + _file.fullPath() + L"\n");
+	}
+}
+
 void source::findScanDirectory(const aci::aDir& _dir, const std::wstring& _shortPath, const QString& _textToFind, std::list<std::pair<std::wstring, unsigned long long>>& _matches) {
 	// Check files
 	for (auto f : _dir.files()) {
@@ -1095,6 +1160,39 @@ void source::finishPerform() {
 	setColor(Color::WHITE);
 	print(m_prefix + L"Done\n");
 	enableInput();
+}
+
+void source::scanAndTidyDir(aci::aDir& _dir) {
+	// Scan
+	print(m_prefix + L"Scanning: Directory\n");
+	_dir.scanAll();
+
+	print(m_prefix + L"Directory information (no filter) loaded with:\n\t- Directories: " +
+		QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
+
+	// #########################################################################################################################
+
+	// Apply filter
+
+	if (m_whiteListDActive) {
+		print(m_prefix + L"Applying filter: Directory: Whitelist\n");
+		_dir.filterDirectoriesWithWhitelist(m_whiteListD);
+	}
+	if (m_blackListDActive) {
+		print(m_prefix + L"Applying filter: Directory: Blacklist\n");
+		_dir.filterDirectoriesWithBlacklist(m_blackListD);
+	}
+	if (m_whiteListFActive) {
+		print(m_prefix + L"Applying filter: File: Whitelist\n");
+		_dir.filterFilesWithWhitelist(m_whiteListF);
+	}
+	if (m_blackListFActive) {
+		print(m_prefix + L"Applying filter: File: Blacklist\n");
+		_dir.filterFilesWithBlacklist(m_blackListF);
+	}
+
+	print(m_prefix + L"Directory information filtered with remaining:\n\t- Directories: " +
+		QString::number(_dir.subDirCount()).toStdWString() + L"\n\t- Files: " + QString::number(_dir.fileCount()).toStdWString() + L"\n");
 }
 
 std::wstring source::fillString(const std::wstring& _original, size_t _length) {
